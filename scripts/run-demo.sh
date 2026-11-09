@@ -29,7 +29,7 @@ trap cleanup EXIT INT TERM
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  The Agent Interoperability Stack (All-Go Edition)${NC}"
-echo -e "${CYAN}  ADK-Go v2 × A2A v2 × A2UI v0.9 × Temporal WorkflowStreams${NC}"
+echo -e "${CYAN}  ADK-Go v2.7.1 × A2A v2.8.0 × A2UI v1.0 × Temporal v1.50.0${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 PORTS="7233 8000 8233 9001 9002 9003 9004 5173 5174"
@@ -78,6 +78,7 @@ echo -e "${GREEN}  All services running!${NC}"
 echo -e ""
 echo -e "  Presenter UI:  ${CYAN}http://localhost:5173${NC}  (4 scenarios)"
 echo -e "  Audience UI:   ${CYAN}http://localhost:5174${NC}  (QR phone kiosk)"
+echo -e "  Slide Deck:    ${CYAN}http://localhost:8000/slides${NC}  (Talk presentation)"
 echo -e "  Go BFF API:    ${CYAN}http://localhost:8000${NC}  (SSE + WorkerManager)"
 echo -e "  A2A Agents:    ${CYAN}http://localhost:9001..9004/.well-known/agent-card.json${NC}"
 echo -e "  Temporal UI:   ${CYAN}http://localhost:8233${NC}  (Event History & Replay)"

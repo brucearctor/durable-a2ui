@@ -193,7 +193,7 @@ func BuildMenuSurface(filter string) []map[string]any {
 	}
 }
 
-// BuildCartSurface builds an interactive A2UI v0.9 cart summary card with a "Confirm Order" button.
+// BuildCartSurface builds an interactive A2UI v1.0 cart summary card with a "Confirm Order" button.
 func BuildCartSurface(cart map[string]CartItem) []map[string]any {
 	surfaceID := "cart-surface"
 	rowIDs := make([]string, 0, len(cart))
@@ -297,7 +297,7 @@ func BuildCartSurface(cart map[string]CartItem) []map[string]any {
 	}
 }
 
-// BuildDietarySurface builds an A2UI v0.9 card showing the remote A2A Dietary Advisor report.
+// BuildDietarySurface builds an A2UI v1.0 card showing the remote A2A Dietary Advisor report.
 func BuildDietarySurface(summary string) []map[string]any {
 	surfaceID := "dietary-report"
 	comps := []map[string]any{
