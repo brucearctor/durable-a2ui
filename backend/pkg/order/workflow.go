@@ -65,7 +65,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 						state.ETAMinutes /= 2
 					}
 					for _, m := range UpdateStepProgress(state) {
-						ui.Publish(m)
+						_ = ui.Publish(m)
 					}
 				}
 				continue
@@ -80,7 +80,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 					state.Status = "cancelled"
 					state.CancelReason = fmt.Sprintf("Cancelled by %s", state.Customer)
 					for _, m := range UpdateCancelled(state) {
-						ui.Publish(m)
+						_ = ui.Publish(m)
 					}
 				}
 				continue
@@ -90,13 +90,13 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 	}
 
 	for _, m := range CreateOrderSurface() {
-		ui.Publish(m)
+		_ = ui.Publish(m)
 	}
 	for _, m := range BuildInitialComponents(state) {
-		ui.Publish(m)
+		_ = ui.Publish(m)
 	}
 	for _, m := range BuildInitialDataModel(state) {
-		ui.Publish(m)
+		_ = ui.Publish(m)
 	}
 
 	actCtx := workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
@@ -133,12 +133,12 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 		if res.Driver != nil && state.Driver == nil {
 			state.Driver = res.Driver
 			for _, m := range AddDriverCard(state) {
-				ui.Publish(m)
+				_ = ui.Publish(m)
 			}
 		}
 
 		for _, m := range UpdateStepProgress(state) {
-			ui.Publish(m)
+			_ = ui.Publish(m)
 		}
 
 		if stg.delay > 0 {
@@ -164,7 +164,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 							state.ETAMinutes /= 2
 						}
 						for _, m := range UpdateStepProgress(state) {
-							ui.Publish(m)
+							_ = ui.Publish(m)
 						}
 					}
 				})
@@ -181,7 +181,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 						state.Status = "cancelled"
 						state.CancelReason = fmt.Sprintf("Cancelled by %s", state.Customer)
 						for _, m := range UpdateCancelled(state) {
-							ui.Publish(m)
+							_ = ui.Publish(m)
 						}
 					}
 				})

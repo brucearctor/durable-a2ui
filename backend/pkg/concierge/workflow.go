@@ -66,7 +66,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 	publishChat := func(role, text string) {
 		messageCounter++
 		msgID := fmt.Sprintf("msg-%d", messageCounter)
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
 			"role": role,
 			"text": text,
 			"id":   msgID,
@@ -74,7 +74,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 	}
 
 	streamText := func(msgID, text string, streaming bool) {
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
 			"role":      "assistant",
 			"text":      text,
 			"id":        msgID,
@@ -83,7 +83,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 	}
 
 	setTyping := func(typing bool) {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/typing", typing))
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/typing", typing))
 	}
 
 	publishTrace := func(eventType string, fields map[string]any) {
@@ -97,11 +97,11 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 		for k, v := range fields {
 			val[k] = v
 		}
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
 	}
 
 	publishMetrics := func() {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
 			"total_tokens":    totalTokens,
 			"total_cost_usd":  totalCostUSD,
 			"turn_count":      turnCount,
@@ -114,7 +114,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 		for _, i := range items {
 			parts = append(parts, fmt.Sprintf("%s ×%d", i.Name, i.Qty))
 		}
-		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
 			"status":    "pending",
 			"total":     total,
 			"threshold": approvalThreshold,
@@ -124,7 +124,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 	}
 
 	publishApprovalUpdate := func(decision string) {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
 			"status":   decision,
 			"customer": customer,
 		}))
@@ -330,7 +330,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 
 	// Create initial chat surface and greeting (only on first run before compaction)
 	if input.StreamState == nil {
-		ui.Publish(a2ui.CreateSurface("chat", false))
+		_ = ui.Publish(a2ui.CreateSurface("chat", false))
 		publishChat("assistant", fmt.Sprintf("Hi %s! 👋 I'm your AI concierge at **Durable Eats** (powered by Go ADK + A2A + A2UI + Temporal). Want to see our **CDMX Taquería & Campus Boba** menu or order for your team?", customer))
 	}
 
@@ -456,7 +456,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 			streamText(streamMsgID, responseText, false)
 		}
 		for _, a2uiMsg := range queuedA2UI {
-			ui.Publish(a2uiMsg)
+			_ = ui.Publish(a2uiMsg)
 		}
 
 		// Human-in-the-loop: wait for manager approval if triggered
@@ -525,8 +525,8 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 			publishChat("assistant", fmt.Sprintf("🚚 Your order is live! (%s — $%.2f)", strings.Join(summaryParts, ", "), total))
 
 			trackSID := fmt.Sprintf("track-%s", orderWfID)
-			ui.Publish(a2ui.CreateSurface(trackSID, false))
-			ui.Publish(a2ui.UpdateComponents(trackSID, []map[string]any{
+			_ = ui.Publish(a2ui.CreateSurface(trackSID, false))
+			_ = ui.Publish(a2ui.UpdateComponents(trackSID, []map[string]any{
 				{"id": "root", "component": "Card", "child": "track_col"},
 				{"id": "track_col", "component": "Column", "children": []string{"track_icon", "track_title", "track_btn"}},
 				{"id": "track_icon", "component": "Text", "text": "🚚", "textStyle": map[string]any{"fontSize": 36}},

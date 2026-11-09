@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ab/durable-a2ui/backend/pkg/a2aservers"
 )
@@ -44,7 +45,12 @@ func main() {
 		go func() {
 			addr := fmt.Sprintf("127.0.0.1:%d", srv.port)
 			log.Printf("🔗 Starting %s on http://%s (AgentCard: /.well-known/agent-card.json)", srv.name, addr)
-			if err := http.ListenAndServe(addr, srv.mux); err != nil {
+			httpSrv := &http.Server{
+				Addr:              addr,
+				Handler:           srv.mux,
+				ReadHeaderTimeout: 10 * time.Second,
+			}
+			if err := httpSrv.ListenAndServe(); err != nil {
 				log.Printf("A2A server on :%d stopped: %v", srv.port, err)
 			}
 		}()

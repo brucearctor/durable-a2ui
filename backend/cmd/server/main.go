@@ -395,7 +395,11 @@ func ensureA2AServersRunning() {
 		port := p.port
 		go func() {
 			log.Printf("🔗 Embedded A2A server listening on http://127.0.0.1:%d", port)
-			_ = http.Serve(ln, mux)
+			httpSrv := &http.Server{
+				Handler:           mux,
+				ReadHeaderTimeout: 10 * time.Second,
+			}
+			_ = httpSrv.Serve(ln)
 		}()
 	}
 }
@@ -948,8 +952,9 @@ func main() {
 	log.Printf("🚀 Durable A2UI Go BFF Server listening on http://%s", addr)
 
 	srv := &http.Server{
-		Addr:    addr,
-		Handler: corsMiddleware(mux),
+		Addr:              addr,
+		Handler:           corsMiddleware(mux),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	go func() {

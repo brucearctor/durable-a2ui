@@ -67,12 +67,12 @@ func ApprovalWorkflow(ctx workflow.Context, input ApprovalInput) (string, error)
 
 	publishRequester := func(msgs []map[string]any) {
 		for _, m := range msgs {
-			requesterUI.Publish(m)
+			_ = requesterUI.Publish(m)
 		}
 	}
 	publishApprover := func(msgs []map[string]any) {
 		for _, m := range msgs {
-			approverUI.Publish(m)
+			_ = approverUI.Publish(m)
 		}
 	}
 

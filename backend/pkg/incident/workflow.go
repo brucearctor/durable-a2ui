@@ -51,7 +51,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 	publishChat := func(role, text string) {
 		messageCounter++
 		msgID := fmt.Sprintf("msg-%d", messageCounter)
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
 			"role": role,
 			"text": text,
 			"id":   msgID,
@@ -59,7 +59,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 	}
 
 	streamText := func(msgID, text string, streaming bool) {
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/messages/%s", msgID), map[string]any{
 			"role":      "assistant",
 			"text":      text,
 			"id":        msgID,
@@ -68,7 +68,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 	}
 
 	setTyping := func(typing bool) {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/typing", typing))
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/typing", typing))
 	}
 
 	publishTrace := func(eventType string, fields map[string]any) {
@@ -82,11 +82,11 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 		for k, v := range fields {
 			val[k] = v
 		}
-		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
 	}
 
 	publishMetrics := func() {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
 			"total_tokens":    totalTokens,
 			"total_cost_usd":  totalCostUSD,
 			"turn_count":      turnCount,
@@ -95,7 +95,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 	}
 
 	publishApprovalBanner := func(status string) {
-		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+		_ = ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
 			"status":        status,
 			"commander":     commander,
 			"service":       input.ServiceName,
@@ -216,7 +216,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 	}
 
 	if input.StreamState == nil {
-		ui.Publish(a2ui.CreateSurface("chat", false))
+		_ = ui.Publish(a2ui.CreateSurface("chat", false))
 		publishChat("assistant", fmt.Sprintf("🚨 **CloudGuard AI SRE Incident Commander** active for Commander **%s**.\n\n**Active Alert:** `%s` — *%s*\n\nClick a prompt below or press **Fast Forward (`F`)** to run the multi-agent A2A diagnostic & remediation pipeline.", commander, input.ServiceName, input.IncidentSummary))
 	}
 
@@ -330,7 +330,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 			streamText(streamMsgID, responseText, false)
 		}
 		for _, a2uiMsg := range queuedA2UI {
-			ui.Publish(a2uiMsg)
+			_ = ui.Publish(a2uiMsg)
 		}
 
 		// Wait for Incident Commander HITL approval if triggered
