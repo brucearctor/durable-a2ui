@@ -1,0 +1,22 @@
+# Binaries & build outputs
+backend/bin/
+*.exe
+*.out
+*.test
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+
+# Environment & secrets
+.env
+.env.local
+
+# Logs & PIDs
+*.log
+*.pid
+/tmp/
+
+# OS
+.DS_Store
