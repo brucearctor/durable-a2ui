@@ -97,26 +97,16 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 		for k, v := range fields {
 			val[k] = v
 		}
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path":  fmt.Sprintf("/trace/%s", traceID),
-				"value": val,
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
 	}
 
 	publishMetrics := func() {
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path": "/metrics",
-				"value": map[string]any{
-					"total_tokens":    totalTokens,
-					"total_cost_usd":  totalCostUSD,
-					"turn_count":      turnCount,
-					"tool_call_count": toolCallCount,
-				},
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
+			"total_tokens":    totalTokens,
+			"total_cost_usd":  totalCostUSD,
+			"turn_count":      turnCount,
+			"tool_call_count": toolCallCount,
+		}))
 	}
 
 	publishApprovalCard := func(items []CartItem, total float64) {
@@ -124,30 +114,20 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 		for _, i := range items {
 			parts = append(parts, fmt.Sprintf("%s ×%d", i.Name, i.Qty))
 		}
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path": "/approval",
-				"value": map[string]any{
-					"status":    "pending",
-					"total":     total,
-					"threshold": approvalThreshold,
-					"items":     strings.Join(parts, ", "),
-					"customer":  customer,
-				},
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+			"status":    "pending",
+			"total":     total,
+			"threshold": approvalThreshold,
+			"items":     strings.Join(parts, ", "),
+			"customer":  customer,
+		}))
 	}
 
 	publishApprovalUpdate := func(decision string) {
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path": "/approval",
-				"value": map[string]any{
-					"status":   decision,
-					"customer": customer,
-				},
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+			"status":   decision,
+			"customer": customer,
+		}))
 	}
 
 	// Signal channels

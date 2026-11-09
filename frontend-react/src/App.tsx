@@ -59,13 +59,13 @@ export default function App() {
     <div className="app a2ui-dark">
       <header className="header" onClick={() => navigateTo('/')} style={{ cursor: 'pointer' }}>
         <h1>The Agent Interoperability Stack</h1>
-        <p className="subtitle">Go ADK × A2A v2 × A2UI v0.9 × Temporal WorkflowStreams</p>
+        <p className="subtitle">Go ADK v2.7 × A2A v2.8 × A2UI v1.0 × Temporal WorkflowStreams</p>
         <div className="tech-badges">
           <span className="tech-badge">🐹 Go 1.26</span>
-          <span className="tech-badge">🧠 ADK-Go v2</span>
-          <span className="tech-badge">🔗 A2A JSON-RPC</span>
-          <span className="tech-badge">⚡ A2UI v0.9</span>
-          <span className="tech-badge">⏳ Temporal</span>
+          <span className="tech-badge">🧠 ADK-Go v2.7</span>
+          <span className="tech-badge">🔗 A2A v2.8</span>
+          <span className="tech-badge">⚡ A2UI v1.0</span>
+          <span className="tech-badge">⏳ Temporal v1.50</span>
           <a
             className="tech-badge"
             href="/slides"

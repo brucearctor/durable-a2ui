@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo, Component, type ReactNode, type ErrorInfo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { A2uiSurface } from '@a2ui/react/v0_9';
+import { A2uiSurface } from '@a2ui/react';
 import { Bot, ClipboardList, ShoppingCart, CheckCircle, Mic, Square, Send, FastForward, RefreshCw, Pizza, Zap, CakeSlice, MessageCircle, Loader, Rocket, AlertTriangle, ShieldCheck, ShieldX } from 'lucide-react';
 import { useWorkflowStream } from '../hooks/useWorkflowStream';
 import type { StreamOptions } from '../hooks/useWorkflowStream';
@@ -275,7 +275,7 @@ export default function AiConcierge() {
           <div className="chat-start-icon"><Bot size={48} /></div>
           <div className="chat-start-title">Durable Eats AI Concierge</div>
           <div className="chat-start-subtitle">
-            Go ADK Multi-Agent + A2A JSON-RPC (:9001 / :9002) + A2UI v0.9 + Temporal
+            Go ADK v2.7 Multi-Agent + A2A v2.8 (:9001 / :9002) + A2UI v1.0 + Temporal
           </div>
         </div>
         <div className="order-form">

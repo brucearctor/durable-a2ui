@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MessageProcessor, SurfaceModel } from '@a2ui/web_core/v0_9';
-import { basicCatalog } from '@a2ui/react/v0_9';
-import type { ReactComponentImplementation } from '@a2ui/react/v0_9';
+import { MessageProcessor, SurfaceModel, basicCatalog } from '@a2ui/web_core/v1_0';
+import { basicCatalog as basicCatalogV09 } from '@a2ui/web_core/v0_9';
+import { setMarkdownRenderer } from '@a2ui/web_core/v0_9/basic_catalog';
+import { renderMarkdown } from '@a2ui/markdown-it';
+import type { ReactComponentImplementation } from '@a2ui/react';
 import type { A2uiMessage, A2uiClientAction } from '@a2ui/web_core/v0_9';
+
+// Register markdown-it renderer for A2UI v1.0 Text components
+setMarkdownRenderer(renderMarkdown);
 
 /**
  * useWorkflowStream — React hook for consuming A2UI WorkflowStream events.
@@ -50,16 +55,32 @@ function classifyMessage(msg: A2uiMessage): { type: string; summary: string } {
 }
 
 /**
- * Safely process an A2UI message, ignoring "already exists" errors that
- * occur during reconnect/replay when the processor already has the surface.
+ * Safely process an A2UI message, replacing existing surfaces when re-created
+ * and ignoring benign replay errors.
  */
-function safeProcess(processor: MessageProcessor<ReactComponentImplementation>, msg: A2uiMessage): void {
+function safeProcess(
+  processor: MessageProcessor<any>,
+  msg: A2uiMessage,
+  isReplay = false,
+): void {
   try {
+    if ('createSurface' in msg) {
+      const cs = (msg as any).createSurface;
+      if (cs?.surfaceId && processor.getSurface(cs.surfaceId)) {
+        if (isReplay) {
+          return;
+        }
+        processor.processMessages([
+          {
+            version: (msg as any).version || '1.0',
+            deleteSurface: { surfaceId: cs.surfaceId },
+          } as any,
+        ]);
+      }
+    }
     processor.processMessages([msg]);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    // "Surface X already exists" is expected during replay/reconnect — skip it.
-    // All other errors are real problems.
     if (message.includes('already exists')) {
       console.debug('[A2UI] Skipping duplicate surface on replay');
     } else {
@@ -71,8 +92,8 @@ function safeProcess(processor: MessageProcessor<ReactComponentImplementation>, 
 function createProcessor(
   workflowIdRef: React.RefObject<string | null>,
   optionsRef: React.RefObject<StreamOptions | undefined>,
-): MessageProcessor<ReactComponentImplementation> {
-  return new MessageProcessor([basicCatalog], (action: A2uiClientAction) => {
+): MessageProcessor<any> {
+  return new MessageProcessor([basicCatalog as any, basicCatalogV09 as any], (action: A2uiClientAction) => {
     const id = workflowIdRef.current;
     if (!id) return;
     console.log('[A2UI] User action:', action);
@@ -165,7 +186,7 @@ export function useWorkflowStream(workflowId: string | null, options?: StreamOpt
             if (prev.some((m) => m.id === event.lastEventId)) return prev;
             return [...prev, { id: event.lastEventId, timestamp: Date.now(), type, summary, data: msg }];
           });
-          safeProcess(processor, msg);
+          safeProcess(processor, msg, true);
         };
 
         es.addEventListener('done', (event) => {
@@ -196,7 +217,7 @@ export function useWorkflowStream(workflowId: string | null, options?: StreamOpt
 
     const sub1 = processor.onSurfaceCreated((surface: SurfaceModel<ReactComponentImplementation>) => {
       console.log('[A2UI] Surface created:', surface.id);
-      setSurfaces((prev) => [...prev, surface]);
+      setSurfaces((prev) => [...prev.filter((s) => s.id !== surface.id), surface]);
     });
     const sub2 = processor.onSurfaceDeleted((id: string) => {
       console.log('[A2UI] Surface deleted:', id);

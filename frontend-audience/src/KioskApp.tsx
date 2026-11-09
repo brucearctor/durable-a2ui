@@ -8,16 +8,32 @@
  *   ?wf=workflow-id&role=approver   — approval workflow, approver view
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageProcessor, SurfaceModel } from '@a2ui/web_core/v0_9';
-import { basicCatalog, A2uiSurface } from '@a2ui/react/v0_9';
-import type { ReactComponentImplementation } from '@a2ui/react/v0_9';
+import { MessageProcessor, SurfaceModel, basicCatalog } from '@a2ui/web_core/v1_0';
+import { basicCatalog as basicCatalogV09 } from '@a2ui/web_core/v0_9';
+import { setMarkdownRenderer } from '@a2ui/web_core/v0_9/basic_catalog';
+import { renderMarkdown } from '@a2ui/markdown-it';
+import { A2uiSurface } from '@a2ui/react';
+import type { ReactComponentImplementation } from '@a2ui/react';
 import type { A2uiMessage, A2uiClientAction } from '@a2ui/web_core/v0_9';
 import './KioskApp.css';
 
+setMarkdownRenderer(renderMarkdown);
+
 type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'done';
 
-function safeProcess(processor: MessageProcessor, msg: A2uiMessage): void {
+function safeProcess(processor: MessageProcessor<any>, msg: A2uiMessage): void {
   try {
+    if ('createSurface' in msg) {
+      const cs = (msg as any).createSurface;
+      if (cs?.surfaceId && processor.getSurface(cs.surfaceId)) {
+        processor.processMessages([
+          {
+            version: (msg as any).version || '1.0',
+            deleteSurface: { surfaceId: cs.surfaceId },
+          } as any,
+        ]);
+      }
+    }
     processor.processMessages([msg]);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
@@ -34,7 +50,7 @@ export default function KioskApp() {
 
   const [surfaces, setSurfaces] = useState<SurfaceModel<ReactComponentImplementation>[]>([]);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
-  const processorRef = useRef<MessageProcessor | null>(null);
+  const processorRef = useRef<MessageProcessor<any> | null>(null);
 
   // Determine stream URL based on role
   const streamUrl = role
@@ -58,11 +74,11 @@ export default function KioskApp() {
   useEffect(() => {
     if (!workflowId) return;
 
-    const processor = new MessageProcessor([basicCatalog], sendAction);
+    const processor = new MessageProcessor<ReactComponentImplementation>([basicCatalog as any, basicCatalogV09 as any], sendAction);
     processorRef.current = processor;
 
-    const sub1 = processor.onSurfaceCreated((surface) => {
-      setSurfaces((prev) => [...prev, surface]);
+    const sub1 = processor.onSurfaceCreated((surface: SurfaceModel<ReactComponentImplementation>) => {
+      setSurfaces((prev) => [...prev.filter((s) => s.id !== surface.id), surface]);
     });
     const sub2 = processor.onSurfaceDeleted((id) => {
       setSurfaces((prev) => prev.filter((s) => s.id !== id));

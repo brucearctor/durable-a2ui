@@ -4,7 +4,7 @@
  * Includes: progress bar, narrative captions, auto-demo, kill-worker, surface flash.
  */
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { A2uiSurface } from '@a2ui/react/v0_9';
+import { A2uiSurface } from '@a2ui/react';
 import { useWorkflowStream } from '../hooks/useWorkflowStream';
 import { StatusBadge, QRShare, EventLog, FragileOverlay, ControlsBar, ConnectionBanner } from '../components/shared';
 import { StageProgressBar } from '../components/StageProgressBar';

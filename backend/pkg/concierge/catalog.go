@@ -113,7 +113,7 @@ func FindMenuItem(query string) (MenuItemInfo, bool) {
 	return MenuItemInfo{}, false
 }
 
-// BuildMenuSurface builds an interactive A2UI v0.9 menu card with 1-click "Add" buttons.
+// BuildMenuSurface builds an interactive A2UI v1.0 menu card with 1-click "Add" buttons.
 func BuildMenuSurface(filter string) []map[string]any {
 	surfaceID := "menu-surface"
 	rowIDs := make([]string, 0, len(MenuCatalog))

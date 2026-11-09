@@ -82,42 +82,27 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 		for k, v := range fields {
 			val[k] = v
 		}
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path":  fmt.Sprintf("/trace/%s", traceID),
-				"value": val,
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", fmt.Sprintf("/trace/%s", traceID), val))
 	}
 
 	publishMetrics := func() {
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path": "/metrics",
-				"value": map[string]any{
-					"total_tokens":    totalTokens,
-					"total_cost_usd":  totalCostUSD,
-					"turn_count":      turnCount,
-					"tool_call_count": toolCallCount,
-				},
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", "/metrics", map[string]any{
+			"total_tokens":    totalTokens,
+			"total_cost_usd":  totalCostUSD,
+			"turn_count":      turnCount,
+			"tool_call_count": toolCallCount,
+		}))
 	}
 
 	publishApprovalBanner := func(status string) {
-		ui.Publish(map[string]any{
-			"updateDataModel": map[string]any{
-				"path": "/approval",
-				"value": map[string]any{
-					"status":        status,
-					"commander":     commander,
-					"service":       input.ServiceName,
-					"runbook":       "RB-402: Shift 100% GKE traffic to checkout-api-stable-v2.13.8 & drain leaked AlloyDB tx",
-					"blast_radius":  "14,200 req/s across mx-central1 & us-central1 (Change Freeze Active)",
-					"slo_burn_rate": "18.4x",
-				},
-			},
-		})
+		ui.Publish(a2ui.UpdateDataModel("chat", "/approval", map[string]any{
+			"status":        status,
+			"commander":     commander,
+			"service":       input.ServiceName,
+			"runbook":       "RB-402: Shift 100% GKE traffic to checkout-api-stable-v2.13.8 & drain leaked AlloyDB tx",
+			"blast_radius":  "14,200 req/s across mx-central1 & us-central1 (Change Freeze Active)",
+			"slo_burn_rate": "18.4x",
+		}))
 	}
 
 	userMsgCh := workflow.GetSignalChannel(ctx, "user_message")

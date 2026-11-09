@@ -224,14 +224,14 @@ code,pre{font-family:'JetBrains Mono',monospace}
     <div class="eyebrow" id="slide1Eyebrow">GDG DevFest Ciudad de México 2026 · University CS Lecture Series</div>
     <h1>The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything</h1>
     <div class="subtitle" id="slide1Subtitle">
-      How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK</strong>), collaborate across services (<strong>A2A</strong>), stream rich declarative interfaces (<strong>A2UI v0.9</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal</strong>).
+      How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK v2.7</strong>), collaborate across services (<strong>A2A v2.8</strong>), stream rich declarative interfaces (<strong>A2UI v1.0</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal v1.50</strong>).
     </div>
     <div class="badge-row">
-      <div class="tech-badge">🧠 <code>google.golang.org/adk/v2</code></div>
-      <div class="tech-badge">🤝 <code>github.com/a2aproject/a2a-go/v2</code></div>
-      <div class="tech-badge">🖼️ <code>A2UI v0.9 + @a2ui/react</code></div>
-      <div class="tech-badge">⚡ <code>go.temporal.io/sdk/contrib/googleadk</code></div>
-      <div class="tech-badge">🌊 <code>go.temporal.io/sdk/contrib/workflowstreams</code></div>
+      <div class="tech-badge">🧠 <code>google.golang.org/adk/v2 v2.7</code></div>
+      <div class="tech-badge">🤝 <code>github.com/a2aproject/a2a-go/v2 v2.8</code></div>
+      <div class="tech-badge">🖼️ <code>A2UI v1.0 + @a2ui/react v0.15</code></div>
+      <div class="tech-badge">⚡ <code>go.temporal.io/sdk/contrib/googleadk v0.3</code></div>
+      <div class="tech-badge">🌊 <code>go.temporal.io/sdk/contrib/workflowstreams v0.1</code></div>
     </div>
   </div>
 
@@ -270,9 +270,9 @@ code,pre{font-family:'JetBrains Mono',monospace}
     <div class="stack-layer">
       <div>
         <div class="layer-tag">Layer 3 · Face</div>
-        <div class="layer-title">A2UI v0.9 Protocol</div>
+        <div class="layer-title">A2UI v1.0 Protocol</div>
       </div>
-      <div class="layer-desc">Declarative JSON component trees (<code>createSurface</code>, <code>updateComponents</code>) + reactive JSON Pointer deltas (<code>updateDataModel</code>).</div>
+      <div class="layer-desc">Declarative JSON component trees (<code>createSurface</code>, <code>updateComponents</code>) + reactive <code>@path</code> JSON Pointer deltas (<code>updateDataModel</code>).</div>
       <div class="layer-pkg">pkg/a2ui + @a2ui/react</div>
     </div>
 
@@ -282,7 +282,7 @@ code,pre{font-family:'JetBrains Mono',monospace}
         <div class="layer-title">A2A JSON-RPC 2.0</div>
       </div>
       <div class="layer-desc">Agent-to-Agent discovery (<code>/.well-known/agent-card.json</code>) &amp; remote task delegation across 4 Go microservices (<code>:9001</code>–<code>:9004</code>).</div>
-      <div class="layer-pkg">a2aproject/a2a-go/v2</div>
+      <div class="layer-pkg">a2a-go/v2 v2.8.0</div>
     </div>
 
     <div class="stack-layer">
@@ -291,7 +291,7 @@ code,pre{font-family:'JetBrains Mono',monospace}
         <div class="layer-title">Google ADK for Go</div>
       </div>
       <div class="layer-desc">Hierarchical multi-agent orchestration (<code>llmagent.New</code>), sub-agent handoffs, and deterministic vs. activity tools.</div>
-      <div class="layer-pkg">google.golang.org/adk/v2</div>
+      <div class="layer-pkg">adk/v2 v2.7.1</div>
     </div>
 
     <div class="stack-layer highlight">
@@ -300,13 +300,13 @@ code,pre{font-family:'JetBrains Mono',monospace}
         <div class="layer-title">Temporal Durable Execution</div>
       </div>
       <div class="layer-desc">Event-sourced replay for ADK sessions + durable SSE streaming via <code>workflowstreams</code> with automatic <code>Last-Event-ID</code> catch-up.</div>
-      <div class="layer-pkg">sdk/contrib/googleadk</div>
+      <div class="layer-pkg">sdk v1.50 + googleadk v0.3</div>
     </div>
   </div>
 
-  <!-- SLIDE 4: A2UI v0.9 + workflowstreams -->
-  <div class="slide" data-slide="3" data-notes="[7:30–10:00] Show why A2UI v0.9 + Temporal workflowstreams is so clean: send the component tree ONCE, then stream tiny JSON Pointer data model updates. When a phone joins via QR code, workflowstreams replays FromOffset(0) and reconstructs the exact UI state.">
-    <div class="eyebrow">Act II · Agent-to-UI (A2UI v0.9)</div>
+  <!-- SLIDE 4: A2UI v1.0 + workflowstreams -->
+  <div class="slide" data-slide="3" data-notes="[7:30–10:00] Show why A2UI v1.0 + Temporal workflowstreams is so clean: send the component tree ONCE, then stream tiny JSON Pointer data model updates. When a phone joins via QR code, workflowstreams replays FromOffset(0) and reconstructs the exact UI state.">
+    <div class="eyebrow">Act II · Agent-to-UI (A2UI v1.0)</div>
     <h2>Declarative Surfaces + <span>Durable Streams</span></h2>
     <div class="grid-2">
       <pre class="code-block"><span class="cm">// 1. Send structure ONCE when workflow starts</span>
@@ -592,7 +592,7 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
       <div class="card green">
         <h3>✅ Architectural Takeaways</h3>
         <ul>
-          <li><strong>1. Separate Structure from State (A2UI v0.9):</strong> Send component trees once; stream lightweight JSON Pointer data-model deltas.</li>
+          <li><strong>1. Separate Structure from State (A2UI v1.0):</strong> Send component trees once; stream lightweight <code>@path</code> JSON Pointer data-model deltas.</li>
           <li><strong>2. Standardize Agent Boundaries (A2A):</strong> Discover specialist agents via <code>/.well-known/agent-card.json</code> and communicate over JSON-RPC 2.0.</li>
           <li><strong>3. Enforce Guardrails in Code, Not Prompts:</strong> Check safety invariants and human approval gates deterministically in Go before executing side effects.</li>
           <li><strong>4. Make Every Turn Durable (Temporal):</strong> With <code>googleadk</code> + <code>workflowstreams</code>, worker crashes and browser refreshes become non-events.</li>

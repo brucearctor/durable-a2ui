@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { A2uiSurface } from '@a2ui/react/v0_9';
+import { A2uiSurface } from '@a2ui/react';
 import { ShieldAlert, Activity, ShieldCheck, Rocket, CheckCircle, ShieldX, Send, FastForward, RefreshCw, Loader, Zap } from 'lucide-react';
 import { useWorkflowStream } from '../hooks/useWorkflowStream';
 import type { StreamOptions } from '../hooks/useWorkflowStream';
@@ -203,7 +203,7 @@ export default function IncidentCommander() {
           <div className="chat-start-icon"><ShieldAlert size={48} /></div>
           <div className="chat-start-title">CloudGuard AI SRE Incident Commander</div>
           <div className="chat-start-subtitle">
-            Durable Multi-Agent Incident Response — Go ADK + A2A (:9003 Telemetry / :9004 SecOps) + A2UI + Temporal
+            Durable Multi-Agent Incident Response — Go ADK v2.7 + A2A v2.8 (:9003 Telemetry / :9004 SecOps) + A2UI v1.0 + Temporal
           </div>
         </div>
         <div className="order-form">

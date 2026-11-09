@@ -2,19 +2,19 @@
 
 This repository powers the 35–40 minute live conference talk and demo for both **University CS Students** and **GDG DevFest 2026 Ciudad de México (CDMX)**.
 
-Every backend component—workflows, multi-agent orchestration, remote A2A servers, A2UI v0.9 message builders, and the HTTP/SSE BFF—is written in **100% Go**:
+Every backend component—workflows, multi-agent orchestration, remote A2A servers, A2UI v1.0 message builders, and the HTTP/SSE BFF—is written in **100% Go**:
 
-* **🧠 Agent Orchestration (`ADK-Go`)**: `google.golang.org/adk/v2` + `go.temporal.io/sdk/contrib/googleadk` (`googleadk.NewPlugin`, `googleadk.NewContext`, `googleadk.NewModel`, `googleadk.ActivityAsTool`, `googleadk.ExportSession` / `ImportSession`).
-* **🔗 Agent-to-Agent Protocol (`A2A-Go v2`)**: `github.com/a2aproject/a2a-go/v2` (`a2asrv.NewJSONRPCHandler`, `a2asrv.NewStaticAgentCardHandler`, `agentcard.DefaultResolver`, `a2aclient.NewFromCard`) running 4 real HTTP JSON-RPC 2.0 servers on `:9001`–`:9004`.
-* **🎨 Agent-to-UI Protocol (`A2UI v0.9`)**: Declarative component trees (`createSurface`, `updateComponents`, `updateDataModel`) streamed over `go.temporal.io/sdk/contrib/workflowstreams` topics (`a2ui`, `requester-ui`, `approver-ui`).
-* **⏳ Durable Execution (`Temporal`)**: Server-side state, programmatic guardrails, human-in-the-loop (HITL) approval gates, child workflows, and live `SIGKILL` crash recovery.
+* **🧠 Agent Orchestration (`ADK-Go v2.7.1`)**: `google.golang.org/adk/v2` + `go.temporal.io/sdk/contrib/googleadk v0.3.0` (`googleadk.NewPlugin`, `googleadk.NewContext`, `googleadk.NewModel`, `googleadk.ActivityAsTool`, `googleadk.ExportSession` / `ImportSession`).
+* **🔗 Agent-to-Agent Protocol (`A2A-Go v2.8.0`)**: `github.com/a2aproject/a2a-go/v2` (`a2asrv.NewJSONRPCHandler`, `a2asrv.NewStaticAgentCardHandler`, `agentcard.DefaultResolver`, `a2aclient.NewFromCard`) running 4 real HTTP JSON-RPC 2.0 servers on `:9001`–`:9004`.
+* **🎨 Agent-to-UI Protocol (`A2UI v1.0`)**: Declarative component trees (`createSurface`, `updateComponents`, `updateDataModel`) with `@a2ui/react v0.15.0` & `@a2ui/web_core v0.15.0` streamed over `go.temporal.io/sdk/contrib/workflowstreams v0.1.1` topics (`a2ui`, `requester-ui`, `approver-ui`).
+* **⏳ Durable Execution (`Temporal SDK v1.50.0`)**: Server-side state, programmatic guardrails, human-in-the-loop (HITL) approval gates, child workflows, and live `SIGKILL` crash recovery.
 
 ---
 
 ## 4 Live Demo Scenarios (Presenter UI on `:5173`)
 
 1. **Tab 1 — 🍕 Order Tracking (`/order`)**
-   * Single A2UI v0.9 surface (`order-tracker`) driven by `order.OrderWorkflow`.
+   * Single A2UI v1.0 surface (`order-tracker`) driven by `order.OrderWorkflow`.
    * Side-by-side **Fragile (In-Memory)** vs. **Durable (Temporal)** toggle: click **💀 Kill Worker** mid-order to watch Fragile lose all state while Durable resumes from its exact step upon **🔄 Restart Worker**.
    * Audience QR code sync via `:5174`.
 2. **Tab 2 — 📋 Dual-Surface Approval (`/approval`)**
@@ -46,7 +46,7 @@ nix develop -c ./scripts/run-demo.sh
 
 * **00:00 – 05:00 | The "Fragile Agent" Problem**: Why demos work on localhost and die in production; introducing the 4-layer stack (**ADK** = Brain, **A2A** = Remote Agent Mesh, **A2UI** = Generative UI Surface, **Temporal** = Durable Backbone).
 * **05:00 – 12:00 | Act 1 — Tab 1 (`🍕 Order Tracking`) & Tab 2 (`📋 Dual-Surface Approval`)**:
-  * Show A2UI v0.9 JSON envelopes (`createSurface`, `updateComponents`, `updateDataModel`) in the **DevTools (`D`)** panel.
+  * Show A2UI v1.0 JSON envelopes (`createSurface`, `updateComponents`, `updateDataModel`) in the **DevTools (`D`)** panel.
   * Switch between **Fragile** and **Durable** mode and click **💀 Kill Worker**.
   * Open Tab 2, toggle between the **🎓 Campus Hackathon GPU Grant** and **🇲🇽 DevFest CDMX Cloud Grant** presets, and show one workflow driving two role-specific UIs (`requester-ui` and `approver-ui`).
 * **12:00 – 25:00 | Act 2 — Tab 3 (`🤖 Durable Eats Concierge`)**:

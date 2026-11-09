@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { A2uiSurface } from '@a2ui/react/v0_9';
+import { A2uiSurface } from '@a2ui/react';
 import { ClipboardList, User, Briefcase, CheckCircle, XCircle, RefreshCw, Plus, Trash2, Loader, Send } from 'lucide-react';
 import { useWorkflowStream } from '../hooks/useWorkflowStream';
 import type { StreamOptions } from '../hooks/useWorkflowStream';

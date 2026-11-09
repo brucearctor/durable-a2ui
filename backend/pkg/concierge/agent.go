@@ -176,7 +176,7 @@ func CreateConciergeAgent(hooks *WorkflowToolHooks) (agent.Agent, error) {
 
 	sendA2UITool, err := functiontool.New(functiontool.Config{
 		Name:        "send_a2ui_json_to_client",
-		Description: "Validate and publish A2UI v0.9 JSON components to the browser surface.",
+		Description: "Validate and publish A2UI v1.0 JSON components to the browser surface.",
 	}, func(_ agent.Context, args SendA2UIArgs) (SendA2UIResult, error) {
 		if hooks.OnSendA2UI != nil {
 			return hooks.OnSendA2UI(args)

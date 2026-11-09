@@ -12,7 +12,12 @@ func TestA2UIBuildersAndValidation(t *testing.T) {
 		t.Fatalf("expected version %s, got %v", a2ui.Version, cs["version"])
 	}
 
-	raw := `[{"version":"v0.9","createSurface":{"surfaceId":"test","catalogId":"https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json"}},{"version":"v0.9","updateComponents":{"surfaceId":"test","components":[{"id":"root","component":"Text","text":"Hello A2UI"}]}}]`
+	p := a2ui.Path("/title")
+	if p["@path"] != "/title" {
+		t.Fatalf("expected @path binding '/title', got %v", p)
+	}
+
+	raw := `[{"version":"1.0","createSurface":{"surfaceId":"test","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"}},{"version":"1.0","updateComponents":{"surfaceId":"test","components":[{"id":"root","component":"Text","text":"Hello A2UI v1.0"}]}}]`
 	msgs, err := a2ui.ParseAndValidate(raw)
 	if err != nil {
 		t.Fatalf("unexpected validation error: %v", err)
@@ -21,7 +26,7 @@ func TestA2UIBuildersAndValidation(t *testing.T) {
 		t.Fatalf("expected 2 messages, got %d", len(msgs))
 	}
 
-	_, err = a2ui.ParseAndValidate(`[{"version":"v0.9","updateComponents":{"surfaceId":"test","components":[{"id":"not_root","component":"Text"}]}}]`)
+	_, err = a2ui.ParseAndValidate(`[{"version":"1.0","updateComponents":{"surfaceId":"test","components":[{"id":"not_root","component":"Text"}]}}]`)
 	if err == nil {
 		t.Fatal("expected error when root component is missing")
 	}
