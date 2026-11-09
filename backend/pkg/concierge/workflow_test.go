@@ -34,6 +34,10 @@ func TestConciergeWorkflowFullPipelineWithGuardrailAndChildWorkflow(t *testing.T
 	env.RegisterActivityWithOptions(concierge.A2ACheckDietarySafetyActivity, activity.RegisterOptions{Name: "a2a_check_dietary_safety"})
 
 	env.RegisterDelayedCallback(func() {
+		env.SignalWorkflow("user_message", "What restaurants do you recommend?")
+	}, 500*time.Millisecond)
+
+	env.RegisterDelayedCallback(func() {
 		env.SignalWorkflow("user_message", "Show me the menu")
 	}, 1*time.Second)
 

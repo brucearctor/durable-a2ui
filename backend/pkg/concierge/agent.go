@@ -526,7 +526,7 @@ func extractLastUserText(req *model.LLMRequest) string {
 	}
 	for i := len(req.Contents) - 1; i >= 0; i-- {
 		c := req.Contents[i]
-		if c == nil || c.Role != genai.RoleUser {
+		if c == nil || c.Role != genai.RoleUser || isSyntheticContext(c) {
 			continue
 		}
 		for _, p := range c.Parts {
@@ -536,6 +536,15 @@ func extractLastUserText(req *model.LLMRequest) string {
 		}
 	}
 	return ""
+}
+
+func isSyntheticContext(c *genai.Content) bool {
+	for _, p := range c.Parts {
+		if p != nil && strings.HasPrefix(strings.TrimSpace(p.Text), "For context:") {
+			return true
+		}
+	}
+	return false
 }
 
 func extractLastFunctionResponse(req *model.LLMRequest) (string, map[string]any) {
