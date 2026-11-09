@@ -446,7 +446,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 						fnName := part.FunctionCall.Name
 						toolCallCount++
 						if strings.HasPrefix(fnName, "a2a_") {
-							pretty := strings.Title(strings.ReplaceAll(strings.TrimPrefix(fnName, "a2a_"), "_", " "))
+							pretty := strings.ReplaceAll(strings.TrimPrefix(fnName, "a2a_"), "_", " ")
 							publishChat("system", fmt.Sprintf("🔗 *Calling %s A2A agent over JSON-RPC 2.0…*", pretty))
 							publishTrace("tool_call", map[string]any{"tool": fnName})
 							messageCounter++

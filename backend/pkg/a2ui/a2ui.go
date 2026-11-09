@@ -83,34 +83,34 @@ func ParseAndValidate(raw string) ([]map[string]any, error) {
 		for i, item := range v {
 			m, ok := item.(map[string]any)
 			if !ok {
-				return nil, fmt.Errorf("Message %d: must be a JSON object", i)
+				return nil, fmt.Errorf("message %d: must be a JSON object", i)
 			}
 			list = append(list, m)
 		}
 	default:
-		return nil, fmt.Errorf("A2UI payload must be a JSON object or array of objects")
+		return nil, fmt.Errorf("a2ui payload must be a JSON object or array of objects")
 	}
 
 	if len(list) == 0 {
-		return nil, fmt.Errorf("A2UI message list cannot be empty")
+		return nil, fmt.Errorf("a2ui message list cannot be empty")
 	}
 
 	for i, msg := range list {
 		if v, ok := msg["version"].(string); !ok || v != Version {
-			return nil, fmt.Errorf("Message %d: missing or invalid 'version' (must be %q)", i, Version)
+			return nil, fmt.Errorf("message %d: missing or invalid 'version' (must be %q)", i, Version)
 		}
 		hasCreate := msg["createSurface"] != nil
 		hasUpdateComp := msg["updateComponents"] != nil
 		hasUpdateData := msg["updateDataModel"] != nil
 		hasDelete := msg["deleteSurface"] != nil
 		if !hasCreate && !hasUpdateComp && !hasUpdateData && !hasDelete {
-			return nil, fmt.Errorf("Message %d: must contain createSurface, updateComponents, updateDataModel, or deleteSurface", i)
+			return nil, fmt.Errorf("message %d: must contain createSurface, updateComponents, updateDataModel, or deleteSurface", i)
 		}
 
 		if uc, ok := msg["updateComponents"].(map[string]any); ok {
 			compsRaw, ok := uc["components"].([]any)
 			if !ok || len(compsRaw) == 0 {
-				return nil, fmt.Errorf("Message %d: updateComponents requires non-empty 'components' array", i)
+				return nil, fmt.Errorf("message %d: updateComponents requires non-empty 'components' array", i)
 			}
 			hasRoot := false
 			for _, c := range compsRaw {
@@ -119,7 +119,7 @@ func ParseAndValidate(raw string) ([]map[string]any, error) {
 				}
 			}
 			if !hasRoot {
-				return nil, fmt.Errorf("Message %d: updateComponents must include a component with id='root'", i)
+				return nil, fmt.Errorf("message %d: updateComponents must include a component with id='root'", i)
 			}
 		}
 	}

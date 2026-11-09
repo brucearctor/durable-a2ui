@@ -930,6 +930,16 @@ func main() {
 		writeJSON(w, map[string]any{"ok": true})
 	})
 
+	mux.HandleFunc("GET /slides", func(w http.ResponseWriter, r *http.Request) {
+		for _, p := range []string{"slides/index.html", "../slides/index.html"} {
+			if _, err := os.Stat(p); err == nil {
+				http.ServeFile(w, r, p)
+				return
+			}
+		}
+		http.Error(w, "slides/index.html not found", http.StatusNotFound)
+	})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"

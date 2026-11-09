@@ -1,0 +1,17 @@
+# Gitleaks config: extends default rules with project-specific allowlists.
+# See https://github.com/gitleaks/gitleaks#configuration
+
+title = "durable-a2ui gitleaks config"
+
+[useDefault]
+  value = true
+
+[allowlist]
+  description = "durable-a2ui allowlisted paths"
+  paths = [
+    '''.*_test\.go$''',
+    '''\.env\.example$''',
+    '''package-lock\.json$''',
+    '''go\.sum$''',
+    '''flake\.lock$''',
+  ]

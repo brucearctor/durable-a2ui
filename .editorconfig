@@ -1,0 +1,43 @@
+# EditorConfig: https://editorconfig.org
+# Editors apply these rules in real-time; editorconfig-checker enforces them
+# in lefthook and CI.
+
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+# gofmt is the authority for Go layout, and it is a fixer.
+[*.{go,go.tmpl}]
+indent_style = unset
+indent_size = unset
+
+# Shell indents vary between tabs and heredoc bodies.
+[*.sh]
+indent_style = unset
+indent_size = unset
+
+# Markdown indentation is dictated by list marker width.
+[*.md]
+trim_trailing_whitespace = false
+indent_size = unset
+
+# Make recipes must begin with a tab.
+[Makefile]
+indent_style = unset
+
+# TypeScript/React/CSS/HTML files use mixed 2/4 space blocks in JSX/CSS.
+[*.{ts,tsx,css,html}]
+indent_size = unset
+
+# Lockfiles and generated assets are managed by their respective tools.
+[{*.lock,go.sum,package-lock.json,*.svg}]
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = false
+insert_final_newline = unset

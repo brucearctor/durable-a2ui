@@ -1,0 +1,185 @@
+# Lefthook: git hooks managed in-repo, no global setup needed.
+# Install hooks: lefthook install (auto-installed by shellHook in flake.nix)
+# All tools come from the nix dev shell (flake.nix / .envrc).
+#
+# Run manually: lefthook run pre-commit
+
+# ── Pre-commit: fast checks on staged files only (< 3s budget) ───────────
+
+pre-commit:
+  parallel: true
+  commands:
+    editorconfig:
+      run: editorconfig-checker {staged_files}
+
+    no-merge-conflicts:
+      run: |
+        if [ $# -eq 0 ]; then exit 0; fi
+        bad=$(grep -Hn '^<<<<<<<\|^=======$\|^>>>>>>>' {staged_files} || true)
+        if [ -n "$bad" ]; then echo "merge conflicts:"; echo "$bad"; exit 1; fi
+
+    no-large-files:
+      run: |
+        max=$((${MAX_FILE_SIZE_KB:-1024} * 1024))
+        fail=0
+        for f in {staged_files}; do
+          [ -f "$f" ] || continue
+          size=$(wc -c < "$f" | tr -d ' ')
+          if [ "$size" -gt "$max" ]; then
+            echo "too large ($((size/1024))KB): $f"; fail=1
+          fi
+        done
+        exit $fail
+
+    gitleaks:
+      run: gitleaks protect --staged --redact --no-banner
+
+    gofmt:
+      glob: "*.go"
+      run: |
+        bad=$(gofmt -l {staged_files})
+        if [ -n "$bad" ]; then
+          echo "gofmt: these files need formatting:"
+          echo "$bad"
+          exit 1
+        fi
+
+    go-vet:
+      glob: "*.go"
+      run: go -C backend vet ./...
+
+    go-mod-tidy:
+      glob: "backend/*.{go,mod,sum}"
+      run: |
+        cd backend
+        cp go.mod go.mod.bak && cp go.sum go.sum.bak
+        go mod tidy
+        if ! diff -q go.mod go.mod.bak > /dev/null 2>&1 || ! diff -q go.sum go.sum.bak > /dev/null 2>&1; then
+          echo "backend/go.mod or backend/go.sum not tidy — run 'go -C backend mod tidy' and stage the result"
+          mv go.mod.bak go.mod && mv go.sum.bak go.sum
+          exit 1
+        fi
+        rm -f go.mod.bak go.sum.bak
+
+    suppression-guard:
+      run: |
+        set -- {staged_files}
+        if [ $# -eq 0 ]; then exit 0; fi
+        git diff --cached -U0 -- {staged_files} | awk '
+          function has_valid_reason(r, clean, low) {
+            sub(/\*\/[[:space:]]*$/, "", r)
+            sub(/^[[:space:]]+/, "", r)
+            sub(/[[:space:]]+$/, "", r)
+            if (r !~ /[A-Za-z0-9].*[A-Za-z0-9]/) return 0
+            low = tolower(r)
+            clean = low
+            gsub(/[^a-z0-9\/]/, "", clean)
+            if (clean ~ /^(todo|fixme|xxx|hack|na|n\/a|none|tbd)$/) return 0
+            return 1
+          }
+          function should_skip(f) {
+            if (f == "") return 1
+            if (f ~ /(^|\/)(gen|vendor|node_modules|dist|build|mocks)\//) return 1
+            if (f ~ /\.(md|rst|txt|lock|html)$/) return 1
+            if (f ~ /(^|\/)(go\.sum|package-lock\.json|lefthook\.ya?ml)$/) return 1
+            return 0
+          }
+          /^diff --git / {
+            file = $0
+            sub(/^diff --git a\/.* b\//, "", file)
+            next
+          }
+          /^\+\+\+ / {
+            if ($0 == "+++ /dev/null") { file = ""; next }
+            file = substr($0, 5)
+            sub(/^b\//, "", file)
+            next
+          }
+          /^@@ / {
+            hunk = $0
+            sub(/ @@.*$/, "", hunk)
+            sub(/^.*\+/, "", hunk)
+            sub(/,.*$/, "", hunk)
+            lineno = hunk + 0
+            next
+          }
+          /^\+/ && !/^\+\+\+/ {
+            cur_line = lineno
+            lineno++
+            if (should_skip(file)) next
+            line = substr($0, 2)
+            matched = 0
+            ok = 0
+            if (file ~ /\.go$/) {
+              if (line ~ /(\/\/|\/\*)[[:space:]]*nolint([[:space:]:]|$|\*\/)/) {
+                matched = 1
+                rem = line
+                sub(/^.*(\/\/|\/\*)[[:space:]]*nolint(:[A-Za-z0-9_,-]+)?/, "", rem)
+                if (rem ~ /^[[:space:]]*(--|\/\/)/) {
+                  sub(/^[[:space:]]*(--|\/\/)/, "", rem)
+                  ok = has_valid_reason(rem)
+                }
+              } else if (line ~ /(\/\/|\/\*)[[:space:]]*#nosec([[:space:]]|$|\*\/)/) {
+                matched = 1
+                rem = line
+                sub(/^.*(\/\/|\/\*)[[:space:]]*#nosec([[:space:],]+G[0-9]{3})*/, "", rem)
+                if (rem ~ /^[[:space:]]*(--|\/\/)/) {
+                  sub(/^[[:space:]]*(--|\/\/)/, "", rem)
+                  ok = has_valid_reason(rem)
+                }
+              }
+            }
+            if (matched && !ok) {
+              unjustified_loc[++u_count] = file ":" cur_line
+              unjustified_snip[u_count] = line
+            }
+          }
+          END {
+            if (u_count > 0) {
+              for (i = 1; i <= u_count; i++) {
+                print "❌ Unjustified suppression in " unjustified_loc[i] ":"
+                print "   " unjustified_snip[i]
+              }
+              print "Fix the underlying finding, or add an inline justification (e.g. //nolint:rule // reason)."
+              exit 1
+            }
+          }
+        '
+
+# ── Commit message: conventional commits (azra convention) ───────────────
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: |
+        msg=$(head -1 {1})
+        if ! echo "$msg" | grep -qE '^(feat|fix|bugfix|docs|ci|test|refactor|chore|build|perf|style|revert)(\([a-z0-9/-]+\))?!?: .+'; then
+          echo "ERROR: commit message must follow Conventional Commits"
+          echo "  format:  type(scope)?: description"
+          echo "  types:   feat fix bugfix docs ci test refactor chore build perf style revert"
+          echo "  got:     $msg"
+          exit 1
+        fi
+
+# ── Pre-push: full validation before CI sees it ──────────────────────────
+
+pre-push:
+  parallel: true
+  commands:
+    lint:
+      run: cd backend && golangci-lint run ./...
+
+    test:
+      run: go -C backend test -race -count=1 ./...
+
+    build:
+      run: make build
+
+    frontend-build:
+      run: npm --prefix frontend-react run build
+
+    code-review:
+      run: |
+        if command -v code-reviewer >/dev/null 2>&1 && { [ -n "${GOOGLE_CLOUD_PROJECT:-}" ] || [ -n "${CODE_REVIEWER_API_URL:-}" ]; }; then
+          code-reviewer --diff --min-severity high
+        fi

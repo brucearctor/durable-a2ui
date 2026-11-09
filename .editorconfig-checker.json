@@ -1,0 +1,12 @@
+{
+  "Exclude": [
+    "node_modules",
+    "dist",
+    "\\.git/",
+    "flake\\.lock$",
+    "package-lock\\.json$",
+    "go\\.sum$",
+    "\\.svg$",
+    "\\.png$"
+  ]
+}

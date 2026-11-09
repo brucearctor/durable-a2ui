@@ -66,6 +66,16 @@ export default function App() {
           <span className="tech-badge">🔗 A2A JSON-RPC</span>
           <span className="tech-badge">⚡ A2UI v0.9</span>
           <span className="tech-badge">⏳ Temporal</span>
+          <a
+            className="tech-badge"
+            href="/slides"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{ textDecoration: 'none', borderColor: 'rgba(167, 139, 250, 0.45)', color: '#c4b5fd' }}
+          >
+            📽️ Talk Slides
+          </a>
         </div>
       </header>
 

@@ -310,7 +310,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 						fnName := part.FunctionCall.Name
 						toolCallCount++
 						if strings.HasPrefix(fnName, "a2a_") {
-							pretty := strings.Title(strings.ReplaceAll(strings.TrimPrefix(fnName, "a2a_"), "_", " "))
+							pretty := strings.ReplaceAll(strings.TrimPrefix(fnName, "a2a_"), "_", " ")
 							publishChat("system", fmt.Sprintf("🔗 *Calling %s A2A agent over JSON-RPC 2.0…*", pretty))
 							publishTrace("tool_call", map[string]any{"tool": fnName})
 							messageCounter++
@@ -322,11 +322,12 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 					}
 					if part.FunctionResponse != nil {
 						fnName := part.FunctionResponse.Name
-						if fnName == "a2a_diagnose_telemetry" {
+						switch fnName {
+						case "a2a_diagnose_telemetry":
 							telemetryChecked = true
 							publishTrace("function_response", map[string]any{"function": fnName, "status": "allowed"})
 							queuedA2UI = append(queuedA2UI, BuildTelemetrySurface()...)
-						} else if fnName == "a2a_evaluate_blast_radius" {
+						case "a2a_evaluate_blast_radius":
 							policyChecked = true
 							publishTrace("function_response", map[string]any{"function": fnName, "status": "allowed"})
 							queuedA2UI = append(queuedA2UI, BuildRunbookSurface()...)

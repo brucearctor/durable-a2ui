@@ -27,7 +27,7 @@ func (a *Activities) ExecuteStage(ctx context.Context, req StageRequest) (StageR
 		return StageResult{}, ctx.Err()
 	}
 
-	eta := 25
+	var eta int
 	var driver *DriverInfo
 	switch req.Stage {
 	case "confirmed":
