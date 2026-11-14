@@ -23,7 +23,7 @@
    - Set `PUBLIC_URL=https://random-subdomain.trycloudflare.com` in `.env` (or click **Share Live** in the UI and click **Set Public Tunnel URL** to paste it).
    - Now any QR code projected on stage is 100% scannable from mobile phones in the auditorium!
 4. **Open Browser Tabs (or Run Everything Inside the Slide Deck)**
-   - **Tab A — Slide Deck:** `http://localhost:8000/slides` (or online [Google Slides Deck](https://docs.google.com/presentation/d/12E7tx-6DkCLqqWFvItu_chxdHILgFS69X9Iu0g6FOb8/edit?slide=id.p#slide=id.p))
+   - **Tab A — Slide Deck:** `http://localhost:8000/slides` (or online [Google Slides 1](https://docs.google.com/presentation/d/12E7tx-6DkCLqqWFvItu_chxdHILgFS69X9Iu0g6FOb8/edit?slide=id.p#slide=id.p) / [Google Slides 2](https://docs.google.com/presentation/d/1bpdmA4iASw5f3rqMmR9joUri--oGDc7iSn9tS7TW3QM/edit?slide=id.p#slide=id.p))
      - Press `L` on any demo slide to launch the live demo or Temporal Web UI inline.
      - Press `S` to toggle the Speaker Notes drawer.
      - Press `G` to open the Slide Overview grid.
