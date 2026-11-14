@@ -51,8 +51,23 @@ export default function App() {
 
   useEffect(() => {
     const onNav = () => setScenario(getRouteFromPath());
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) {
+        return;
+      }
+      if (e.key === '1') navigateTo('/order');
+      else if (e.key === '2') navigateTo('/approval');
+      else if (e.key === '3') navigateTo('/ai-concierge');
+      else if (e.key === '4') navigateTo('/incident-sre');
+    };
     window.addEventListener('popstate', onNav);
-    return () => window.removeEventListener('popstate', onNav);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('popstate', onNav);
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, []);
 
   return (
