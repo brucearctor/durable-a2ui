@@ -203,7 +203,7 @@ func (s *sreDemoLLM) decide(req *model.LLMRequest) *model.LLMResponse {
 	if lastFn != "" && lastFn != "transfer_to_agent" {
 		switch lastFn {
 		case "a2a_diagnose_telemetry":
-			return sreText("📡 **A2A Telemetry Diagnosis Complete (`:9003`):** Isolated root cause with **96% confidence** to `checkout-api-canary-v2.14.0-rc3` in `mx-central1` & `us-central1` (unclosed `pgx` transaction in payment retry middleware exhausting the 200-connection AlloyDB pool). Click **🛡️ Step 2: Evaluate Blast Radius & SecOps Policy (A2A) →** on the card below!")
+			return sreText("📡 **A2A Telemetry Diagnosis Complete (`:9003`):** Isolated root cause with **96% confidence** to `checkout-api-canary-v2.14.0-rc3` in `us-central1` & `us-east1` (unclosed `pgx` transaction in payment retry middleware exhausting the 200-connection AlloyDB pool). Click **🛡️ Step 2: Evaluate Blast Radius & SecOps Policy (A2A) →** on the card below!")
 		case "a2a_evaluate_blast_radius":
 			if role == "remediation_executor" && (strings.Contains(lower, "execute") || strings.Contains(lower, "rollback") || strings.Contains(lower, "rb-402")) {
 				return sreFn("execute_remediation", map[string]any{
@@ -211,7 +211,7 @@ func (s *sreDemoLLM) decide(req *model.LLMRequest) *model.LLMResponse {
 					"target_revision": "checkout-api-stable-v2.13.8",
 				})
 			}
-			return sreText("🛡️ **A2A SecOps Blast-Radius & Change-Freeze Check Complete (`:9004`):** Policy returned `PASS_WITH_HITL_GATE`. Because `checkout-api` is Tier-0 during the **DevFest CDMX & Campus Live Event Window** (`14,200 req/s`, `18.4x` SLO burn rate), **Runbook RB-402** is approved subject to **Incident Commander HITL sign-off**. Click **🚀 Step 3: Execute Canary Rollback (RB-402) →** below!")
+			return sreText("🛡️ **A2A SecOps Blast-Radius & Change-Freeze Check Complete (`:9004`):** Policy returned `PASS_WITH_HITL_GATE`. Because `checkout-api` is Tier-0 during the **Peak Traffic Launch Window** (`14,200 req/s`, `18.4x` SLO burn rate), **Runbook RB-402** is approved subject to **Incident Commander HITL sign-off**. Click **🚀 Step 3: Execute Canary Rollback (RB-402) →** below!")
 		case "execute_remediation":
 			status, _ := lastResp["status"].(string)
 			switch status {

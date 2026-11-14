@@ -55,7 +55,7 @@ func TestConciergeWorkflowFullPipelineWithGuardrailAndChildWorkflow(t *testing.T
 	}, 10*time.Second)
 
 	env.ExecuteWorkflow(concierge.ConciergeWorkflow, concierge.ConciergeInput{
-		CustomerName: "DevFest Attendee",
+		CustomerName: "Alex Rivera",
 	})
 
 	if !env.IsWorkflowCompleted() {

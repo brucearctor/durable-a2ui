@@ -730,16 +730,16 @@ func main() {
 			body.Requester = "Sarah Chen"
 		}
 		if body.Title == "" {
-			body.Title = "GDG DevFest CDMX & Campus Hackathon GPU Grant"
+			body.Title = "Production AI Inference — GKE L4 GPU Cluster & AlloyDB Quota Grant"
 		}
 		if body.Justification == "" {
-			body.Justification = "Speaker travel to Ciudad de México + L4 GPU lab credits for live A2A + A2UI + Temporal workshop."
+			body.Justification = "Provisioning dedicated GKE L4 GPU inference nodes, AlloyDB read-replica capacity, and OpenTelemetry trace retention for multi-agent workloads."
 		}
 		if len(body.Items) == 0 {
 			body.Items = []approval.ExpenseItem{
-				{Description: "Round-trip flight to Ciudad de México (MEX)", Amount: 680.00, Category: "Travel"},
-				{Description: "Hotel Condesa CDMX (3 nights)", Amount: 720.00, Category: "Lodging"},
-				{Description: "GKE L4 GPU Workshop Cluster Quota", Amount: 485.00, Category: "Cloud Compute"},
+				{Description: "GKE L4 GPU Inference Node Pool (Multi-Zone)", Amount: 680.00, Category: "Cloud Compute"},
+				{Description: "AlloyDB Read-Replica High-Availability Pool", Amount: 720.00, Category: "Database"},
+				{Description: "OpenTelemetry & Distributed Trace Retention Quota", Amount: 485.00, Category: "Observability"},
 				{Description: "Student Hackathon Hardware & Swag Kit", Amount: 250.00, Category: "Materials"},
 			}
 		}

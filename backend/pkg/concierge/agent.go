@@ -108,7 +108,7 @@ func CreateConciergeAgent(hooks *WorkflowToolHooks) (agent.Agent, error) {
 
 	a2aRestTool, err := googleadk.ActivityAsTool(A2AFindRestaurantsActivity, googleadk.ActivityToolOptions{
 		Name:            "a2a_find_restaurants",
-		Description:     "Search for CDMX & Campus restaurants via the remote A2A Restaurant Finder agent (:9001).",
+		Description:     "Search for local & campus restaurants via the remote A2A Restaurant Finder agent (:9001).",
 		ActivityOptions: actOpts,
 	})
 	if err != nil {
@@ -126,7 +126,7 @@ func CreateConciergeAgent(hooks *WorkflowToolHooks) (agent.Agent, error) {
 
 	getMenuTool, err := functiontool.New(functiontool.Config{
 		Name:        "get_menu",
-		Description: "Get the Durable Eats menu with CDMX tacos, campus boba, pizzas, salads, and prices.",
+		Description: "Get the Durable Eats menu with street tacos, campus boba, pizzas, salads, and prices.",
 	}, func(_ agent.Context, args GetMenuArgs) (GetMenuResult, error) {
 		return hooks.OnGetMenu(args)
 	})
@@ -195,7 +195,7 @@ func CreateConciergeAgent(hooks *WorkflowToolHooks) (agent.Agent, error) {
 
 	menuAdvisor, err := llmagent.New(llmagent.Config{
 		Name:        "menu_advisor",
-		Description: "Answers menu questions, recommends CDMX tacos, campus boba, pizzas, and discovers restaurants via A2A.",
+		Description: "Answers menu questions, recommends street tacos, campus boba, pizzas, and discovers restaurants via A2A.",
 		Instruction: "AGENT_ROLE:menu_advisor\nYou are the Menu Advisor for Durable Eats. Use get_menu for menu questions and a2a_find_restaurants for restaurant recommendations.",
 		Model:       m,
 		Tools:       []tool.Tool{getMenuTool, a2aRestTool, sendA2UITool},
@@ -331,9 +331,9 @@ func (d *demoResilientLLM) decide(req *model.LLMRequest) *model.LLMResponse {
 	if lastFnName != "" && lastFnName != "transfer_to_agent" {
 		switch lastFnName {
 		case "get_menu":
-			return textResp("Here is our **Durable Eats** menu featuring **Taquería Orinoco CDMX** street tacos, **Boba & Byte Campus Lab** bubble tea, wood-fired **Bella Napoli** pizzas, and fresh salads! Click **＋ Add** on any card below or tell me what you'd like.")
+			return textResp("Here is our **Durable Eats** menu featuring **Taquería El Sol** street tacos, **Boba & Byte Campus Lab** bubble tea, wood-fired **Bella Napoli** pizzas, and fresh salads! Click **＋ Add** on any card below or tell me what you'd like.")
 		case "a2a_find_restaurants":
-			return textResp("I queried our remote **Restaurant & Campus Spot Finder A2A Agent (`:9001`)** over JSON-RPC 2.0! Top picks include **Taquería Orinoco CDMX** (4.9★, 15 min) for Tacos al Pastor & Gringas, **Boba & Byte Campus Lab** (4.8★, 10 min) for Brown Sugar Boba, and **Bella Napoli** (4.7★) for Margherita Pizza.")
+			return textResp("I queried our remote **Restaurant & Campus Spot Finder A2A Agent (`:9001`)** over JSON-RPC 2.0! Top picks include **Taquería El Sol** (4.9★, 15 min) for Tacos al Pastor & Gringas, **Boba & Byte Campus Lab** (4.8★, 10 min) for Brown Sugar Boba, and **Bella Napoli** (4.7★) for Margherita Pizza.")
 		case "add_to_cart":
 			added, _ := lastFnResp["added"].(string)
 			qty := 1
@@ -431,7 +431,7 @@ func (d *demoResilientLLM) decide(req *model.LLMRequest) *model.LLMResponse {
 		if strings.Contains(lowerUser, "status") {
 			return textResp("Your order is actively tracked by a durable Temporal Child Workflow! Click **📦 Track Your Order →** on the card above or open Tab 1 (Live Order) to inspect its state.")
 		}
-		return textResp("Welcome to **Durable Eats**! You can ask me to **show the menu**, **recommend CDMX taco spots or campus boba via A2A**, **add Tacos al Pastor, Boba, or Pizza to your cart**, **check dietary safety**, or **confirm your order**.")
+		return textResp("Welcome to **Durable Eats**! You can ask me to **show the menu**, **recommend taco spots or campus boba via A2A**, **add Tacos al Pastor, Boba, or Pizza to your cart**, **check dietary safety**, or **confirm your order**.")
 	}
 }
 
@@ -472,7 +472,7 @@ func parseItemAndQuantity(lower string) (string, int) {
 			qty = n
 		}
 	}
-	if strings.Contains(lower, "for 4 people") || strings.Contains(lower, "devfest team") || strings.Contains(lower, "feast") {
+	if strings.Contains(lower, "for 4 people") || strings.Contains(lower, "team") || strings.Contains(lower, "feast") {
 		if qty < 10 && strings.Contains(lower, "feast") {
 			qty = 10 // triggers > $100 Manager HITL Approval Gate!
 		} else if qty == 1 {

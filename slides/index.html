@@ -267,15 +267,10 @@ code,pre{font-family:'JetBrains Mono',monospace}
 <div class="topbar">
   <div class="brand-pill">
     <span>⚡</span>
-    <strong id="eventLabel">GDG DevFest CDMX 2026 &amp; University CS</strong>
-    <span>· All-Go Agent Stack</span>
+    <strong>The Agent Interoperability Stack</strong>
+    <span>· All-Go Edition</span>
   </div>
   <div class="top-controls">
-    <button class="top-btn active" id="btnBoth" onclick="setAudience('both', event)">🌎 Unified</button>
-    <button class="top-btn" id="btnUni" onclick="setAudience('uni', event)">🎓 University CS</button>
-    <button class="top-btn" id="btnCdmx" onclick="setAudience('cdmx', event)">🇲🇽 DevFest CDMX</button>
-    <button class="top-btn" id="btnLang" onclick="toggleLang(event)" title="Toggle English / Español (E)">🌐 EN</button>
-    <button class="top-btn" id="btnTimer" onclick="toggleTimer(event)" title="Start/Pause 35m Talk Timer (T), Reset (Shift+T)">⏱️ 00:00</button>
     <button class="top-btn" id="btnGrid" onclick="toggleGrid(event)" title="Slide Overview Grid (G)">⊞ Slides (G)</button>
     <button class="top-btn" id="btnNotes" onclick="toggleNotes(event)" title="Speaker Notes (S)">🗒️ Notes (S)</button>
     <button class="top-btn" id="btnEmbed" onclick="openEmbed('/order', event)" title="Toggle Embedded Live Demo (L)">🚀 Live Demo (L)</button>
@@ -285,13 +280,10 @@ code,pre{font-family:'JetBrains Mono',monospace}
 <div class="deck" id="deck">
 
   <!-- SLIDE 1: Title -->
-  <div class="slide slide-title active" data-slide="0" data-demo="/order" data-notes="[0:00–2:30] Hook the room: Ask 'Who here has built an AI agent that worked on localhost?' Keep hands up: 'Keep your hand up if it survived a process kill -9 or a user refreshing their browser mid-tool-call.' Today we're building the complete 2026 Agent Interoperability Stack in 100% Go: ADK + A2A + A2UI running on Temporal.">
-    <div class="eyebrow" id="slide1Eyebrow">GDG DevFest Ciudad de México 2026 · University CS Lecture Series</div>
-    <h1 data-en="The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything"
-        data-es="El Stack de Interoperabilidad de Agentes: ADK + A2A + A2UI — y Por Qué la Durabilidad lo Cambia Todo">The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything</h1>
-    <div class="subtitle" id="slide1Subtitle"
-         data-en="How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK v2.7</strong>), collaborate across services (<strong>A2A v2.8</strong>), stream rich declarative interfaces (<strong>A2UI v1.0</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal v1.50</strong>)."
-         data-es="Cómo construir sistemas multi-agente en <strong>Go</strong> puro donde los agentes razonan (<strong>ADK v2.7</strong>), colaboran entre microservicios (<strong>A2A v2.8</strong>), transmiten interfaces declarativas (<strong>A2UI v1.0</strong>) y sobreviven a caídas <code>kill -9</code> sin perder ni un byte (<strong>Temporal v1.50</strong>).">
+  <div class="slide slide-title active" data-slide="0" data-demo="/order" data-notes="Hook the room: Ask 'Who here has built an AI agent that worked on localhost?' Keep hands up: 'Keep your hand up if it survived a process kill -9 or a user refreshing their browser mid-tool-call.' Today we're building the complete Agent Interoperability Stack in 100% Go: ADK + A2A + A2UI running on Temporal.">
+    <div class="eyebrow">Distributed Systems &amp; AI Agents · All-Go Architecture</div>
+    <h1>The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything</h1>
+    <div class="subtitle">
       How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK v2.7</strong>), collaborate across services (<strong>A2A v2.8</strong>), stream rich declarative interfaces (<strong>A2UI v1.0</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal v1.50</strong>).
     </div>
     <div class="badge-row">
@@ -304,9 +296,9 @@ code,pre{font-family:'JetBrains Mono',monospace}
   </div>
 
   <!-- SLIDE 2: The 90% Demo Trap -->
-  <div class="slide" data-slide="1" data-notes="[2:30–5:00] Explain the 90% Demo Trap. Building an agent loop in memory takes 50 lines of code. Making it survive network drops, pod restarts, multi-hour human approvals, and multi-device UI sync is the other 90%.">
+  <div class="slide" data-slide="1" data-notes="Explain the 90% Demo Trap. Building an agent loop in memory takes 50 lines of code. Making it survive network drops, pod restarts, human approvals, and multi-device UI sync is the other 90%.">
     <div class="eyebrow">Act I · The Problem</div>
-    <h2 data-en="The <span>&quot;90% Agent Demo Trap&quot;</span>" data-es="La <span>&quot;Trampa del Demo del 90%&quot;</span>">The <span>"90% Agent Demo Trap"</span></h2>
+    <h2>The <span>"90% Agent Demo Trap"</span></h2>
     <div class="grid-3">
       <div class="card red">
         <div class="big-stat red">1. Fragile Memory</div>
@@ -326,15 +318,14 @@ code,pre{font-family:'JetBrains Mono',monospace}
     </div>
     <div class="card green" style="margin-top:1.35rem">
       <h3>💡 The Core Thesis</h3>
-      <p data-en="<strong>ADK</strong> gives your agent a brain. <strong>A2A</strong> gives it colleagues. <strong>A2UI</strong> gives it a face. <strong>Temporal</strong> gives it a spine."
-         data-es="<strong>ADK</strong> le da cerebro a tu agente. <strong>A2A</strong> le da colegas. <strong>A2UI</strong> le da rostro. <strong>Temporal</strong> le da columna vertebral."><strong>ADK</strong> gives your agent a brain. <strong>A2A</strong> gives it colleagues. <strong>A2UI</strong> gives it a face. <strong>Temporal</strong> gives it a spine.</p>
+      <p><strong>ADK</strong> gives your agent a brain. <strong>A2A</strong> gives it colleagues. <strong>A2UI</strong> gives it a face. <strong>Temporal</strong> gives it a spine.</p>
     </div>
   </div>
 
   <!-- SLIDE 3: The 4-Layer Stack + Interactive Packet Tracer -->
-  <div class="slide" data-slide="2" data-notes="[5:00–7:30] Walk top-to-bottom through the 4 layers in our Go repo. Click the 5 interactive trace buttons at the bottom of the slide to show how a single user action flows across all 4 layers!">
+  <div class="slide" data-slide="2" data-notes="Walk top-to-bottom through the 4 layers in our Go repo. Click the 5 interactive trace buttons at the bottom of the slide to show how a single user action flows across all 4 layers!">
     <div class="eyebrow">Architecture Overview</div>
-    <h2 data-en="The 4-Layer <span>Go Agent Stack</span>" data-es="Las 4 Capas del <span>Stack de Agentes en Go</span>">The 4-Layer <span>Go Agent Stack</span></h2>
+    <h2>The 4-Layer <span>Go Agent Stack</span></h2>
 
     <div class="stack-layer" id="layer-a2ui" onclick="setTraceStep(4, event)">
       <div>
@@ -385,9 +376,9 @@ code,pre{font-family:'JetBrains Mono',monospace}
   </div>
 
   <!-- SLIDE 4: A2UI v1.0 + workflowstreams -->
-  <div class="slide" data-slide="3" data-notes="[7:30–10:00] Show why A2UI v1.0 + Temporal workflowstreams is so clean: send the component tree ONCE, then stream tiny JSON Pointer data model updates. When a phone joins via QR code, workflowstreams replays FromOffset(0) and reconstructs the exact UI state.">
+  <div class="slide" data-slide="3" data-notes="Show why A2UI v1.0 + Temporal workflowstreams is so clean: send the component tree ONCE, then stream tiny JSON Pointer data model updates. When a phone joins via QR code, workflowstreams replays FromOffset(0) and reconstructs the exact UI state.">
     <div class="eyebrow">Act II · Agent-to-UI (A2UI v1.0)</div>
-    <h2 data-en="Declarative Surfaces + <span>Durable Streams</span>" data-es="Superficies Declarativas + <span>Streams Durables</span>">Declarative Surfaces + <span>Durable Streams</span></h2>
+    <h2>Declarative Surfaces + <span>Durable Streams</span></h2>
     <div class="grid-2">
       <pre class="code-block"><span class="cm">// 1. Send structure ONCE when workflow starts (pkg/a2ui/a2ui.go)</span>
 _ = ui.<span class="fn">Publish</span>(a2ui.<span class="fn">CreateSurface</span>(<span class="str">"order-main"</span>, <span class="kw">false</span>))
@@ -415,9 +406,9 @@ _ = ui.<span class="fn">Publish</span>(a2ui.<span class="fn">UpdateDataModel</sp
   </div>
 
   <!-- SLIDE 5: LIVE DEMO 1 -->
-  <div class="slide" data-slide="4" data-demo="/order" data-notes="[10:00–14:00] LIVE DEMO 1 (Tab 1: Order Tracking). Press L right here to open the embedded demo! 1) Start in Durable Mode, open DevTools (D) to show createSurface -> updateComponents -> updateDataModel. 2) Switch to Fragile Mode and click Kill Worker (K) — watch the UI shatter! Switch back to Durable Mode and watch it recover with zero data loss.">
+  <div class="slide" data-slide="4" data-demo="/order" data-notes="LIVE DEMO 1 (Tab 1: Order Tracking). Press L right here to open the embedded demo! 1) Start in Durable Mode, open DevTools (D) to show createSurface -> updateComponents -> updateDataModel. 2) Switch to Fragile Mode and click Kill Worker (K) — watch the UI shatter! Switch back to Durable Mode and watch it recover with zero data loss.">
     <div class="eyebrow">Live Demo 1 · Tab 1</div>
-    <h2 data-en="🍕 Real-Time Order Tracking: <span>Fragile vs. Durable</span>" data-es="🍕 Rastreo de Pedidos en Vivo: <span>Frágil vs. Durable</span>">🍕 Real-Time Order Tracking: <span>Fragile vs. Durable</span></h2>
+    <h2>🍕 Real-Time Order Tracking: <span>Fragile vs. Durable</span></h2>
     <div class="grid-3">
       <div class="card">
         <h3>1️⃣ Inspect A2UI v1.0 Frames</h3>
@@ -445,14 +436,14 @@ _ = ui.<span class="fn">Publish</span>(a2ui.<span class="fn">UpdateDataModel</sp
   </div>
 
   <!-- SLIDE 6: Dual-Surface Architecture -->
-  <div class="slide" data-slide="5" data-notes="[14:00–16:00] Transition to Act II-B: What if two different humans with different permissions need to interact with the SAME durable workflow? One workflow, two workflowstreams topics: requester-ui and approver-ui.">
+  <div class="slide" data-slide="5" data-notes="Transition to Act II-B: What if two different humans with different permissions need to interact with the SAME durable workflow? One workflow, two workflowstreams topics: requester-ui and approver-ui.">
     <div class="eyebrow">Multi-Persona A2UI</div>
-    <h2 data-en="One Workflow, <span>Two Role-Based Surfaces</span>" data-es="Un Workflow, <span>Dos Superficies por Rol</span>">One Workflow, <span>Two Role-Based Surfaces</span></h2>
+    <h2>One Workflow, <span>Two Role-Based Surfaces</span></h2>
     <div class="grid-2">
       <div class="card">
         <h3>👤 Topic 1: <code>requester-ui</code></h3>
         <ul>
-          <li><strong>Audience:</strong> <span class="uni-text">Student Hackathon Lead</span> / <span class="cdmx-text">GDG Cloud CDMX Tech Lead</span></li>
+          <li><strong>Audience:</strong> Platform Tech Lead / Student Hackathon Lead</li>
           <li><strong>Component Tree:</strong> Read-only status tracker, validation progress bar, line-item table, and live audit log.</li>
           <li><strong>Security Boundary:</strong> Approve/Reject button components are <em>never even sent</em> to the requester stream.</li>
         </ul>
@@ -460,9 +451,9 @@ _ = ui.<span class="fn">Publish</span>(a2ui.<span class="fn">UpdateDataModel</sp
       <div class="card green">
         <h3>💼 Topic 2: <code>approver-ui</code></h3>
         <ul>
-          <li><strong>Audience:</strong> <span class="uni-text">Faculty Advisor</span> / <span class="cdmx-text">VP of Engineering</span></li>
+          <li><strong>Audience:</strong> VP of Engineering / Faculty Advisor</li>
           <li><strong>Component Tree:</strong> Policy compliance badge, line-item breakdown, and interactive <strong>✅ Approve</strong> / <strong>❌ Reject</strong> A2UI buttons.</li>
-          <li><strong>Durable Wait:</strong> Blocks on <code>workflow.NewSelector(ctx)</code> for minutes, days, or weeks until the signal arrives.</li>
+          <li><strong>Durable Wait:</strong> Blocks on <code>workflow.NewSelector(ctx)</code> across restarts until the approval signal arrives.</li>
         </ul>
       </div>
     </div>
@@ -472,15 +463,15 @@ approverUI  := stream.<span class="fn">Topic</span>(<span class="str">"approver-
   </div>
 
   <!-- SLIDE 7: LIVE DEMO 2 -->
-  <div class="slide" data-slide="6" data-demo="/approval" data-notes="[16:00–19:30] LIVE DEMO 2 (Tab 2: Dual-Surface Approval). Press L to open the embedded demo! Pick either the 🇲🇽 DevFest CDMX Cloud & Speaker Grant ($2,135) or 🎓 University Campus GPU & Hackathon Grant ($2,135). Submit, let it reach Under Review, KILL THE WORKER, restart it, and click Approve!">
+  <div class="slide" data-slide="6" data-demo="/approval" data-notes="LIVE DEMO 2 (Tab 2: Dual-Surface Approval). Press L to open the embedded demo! Pick either the ☁️ Production AI & GPU Cluster Quota Grant ($2,135) or 🎓 University Campus GPU & Hackathon Grant ($2,135). Submit, let it reach Under Review, KILL THE WORKER, restart it, and click Approve!">
     <div class="eyebrow">Live Demo 2 · Tab 2</div>
-    <h2 data-en="📋 Dual-Surface <span>Human-in-the-Loop Approval</span>" data-es="📋 Aprobación <span>Human-in-the-Loop de Doble Superficie</span>">📋 Dual-Surface <span>Human-in-the-Loop Approval</span></h2>
+    <h2>📋 Dual-Surface <span>Human-in-the-Loop Approval</span></h2>
     <div class="grid-2">
       <div class="card">
-        <h3>🇲🇽 Preset A: DevFest CDMX 2026 Grant (\$2,135)</h3>
+        <h3>☁️ Preset A: Production AI &amp; GPU Cluster Grant (\$2,135)</h3>
         <ul>
-          <li><strong>Requester:</strong> Valeria Morales (GDG Cloud CDMX)</li>
-          <li><strong>Items:</strong> MEX flights, Hotel Condesa, GKE L4 GPU Workshop Quota, <em>Taquería Orinoco</em> catering</li>
+          <li><strong>Requester:</strong> Sarah Chen (Platform Engineering Lead)</li>
+          <li><strong>Items:</strong> GKE L4 GPU Inference Node Pool, AlloyDB Read-Replica Scaling, OpenTelemetry Trace Retention, Team War-Room Catering</li>
           <li><strong>Personas:</strong> Tech Lead vs. VP Engineering</li>
         </ul>
       </div>
@@ -506,7 +497,7 @@ approverUI  := stream.<span class="fn">Topic</span>(<span class="str">"approver-
   </div>
 
   <!-- SLIDE 8: Temporal googleadk Under the Hood -->
-  <div class="slide" data-slide="7" data-notes="[19:30–22:30] Show the Go engineering magic in go.temporal.io/sdk/contrib/googleadk. Explain how googleadk.NewContext bridges workflow.Now, workflow.GetRandomStream, and workflow.Go into ADK, and why deterministic functiontool.New vs ActivityAsTool matters.">
+  <div class="slide" data-slide="7" data-notes="Show the Go engineering magic in go.temporal.io/sdk/contrib/googleadk. Explain how googleadk.NewContext bridges workflow.Now, workflow.GetRandomStream, and workflow.Go into ADK, and why deterministic functiontool.New vs ActivityAsTool matters.">
     <div class="eyebrow">Act III · ADK + Temporal in Go</div>
     <h2>Inside <span><code>go.temporal.io/sdk/contrib/googleadk</code></span></h2>
     <div class="grid-2">
@@ -536,14 +527,14 @@ a2aRestTool, _ := googleadk.<span class="fn">ActivityAsTool</span>(A2AFindRestau
   </div>
 
   <!-- SLIDE 9: A2A Protocol in Go -->
-  <div class="slide" data-slide="8" data-notes="[22:30–24:30] Explain how A2A (github.com/a2aproject/a2a-go/v2) lets our ADK orchestrator discover and call remote specialist agents over JSON-RPC 2.0.">
+  <div class="slide" data-slide="8" data-notes="Explain how A2A (github.com/a2aproject/a2a-go/v2) lets our ADK orchestrator discover and call remote specialist agents over JSON-RPC 2.0.">
     <div class="eyebrow">Agent-to-Agent Interoperability</div>
-    <h2 data-en="4 Real Go <span>A2A JSON-RPC 2.0 Servers</span>" data-es="4 Servidores Reales <span>A2A JSON-RPC 2.0 en Go</span>">4 Real Go <span>A2A JSON-RPC 2.0 Servers</span></h2>
+    <h2>4 Real Go <span>A2A JSON-RPC 2.0 Servers</span></h2>
     <div class="grid-4">
       <div class="card">
         <div class="big-stat cyan">:9001</div>
         <h3>🍽️ Spot Finder</h3>
-        <p>Discovers <em>Taquería Orinoco CDMX</em>, <em>Boba &amp; Byte Campus Lab</em>, <em>Bella Napoli</em>, and <em>Green Garden</em>.</p>
+        <p>Discovers <em>Taquería El Sol</em>, <em>Boba &amp; Byte Campus Lab</em>, <em>Bella Napoli</em>, and <em>Green Garden</em>.</p>
       </div>
       <div class="card green">
         <div class="big-stat green">:9002</div>
@@ -568,9 +559,9 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
   </div>
 
   <!-- SLIDE 10: Programmatic Guardrails + HITL -->
-  <div class="slide" data-slide="9" data-notes="[24:30–26:30] Emphasize this lesson for both students and senior engineers: Never trust a system prompt alone for safety or financial gates. Put programmatic guardrails in your Go tool/workflow code.">
+  <div class="slide" data-slide="9" data-notes="Emphasize this lesson: Never trust a system prompt alone for safety or financial gates. Put programmatic guardrails in your Go tool/workflow code.">
     <div class="eyebrow">Safety &amp; Governance</div>
-    <h2 data-en="Prompt Instructions Are <span>Not Guardrails</span>" data-es="Los Prompts <span>No Son Guardrails</span>">Prompt Instructions Are <span>Not Guardrails</span></h2>
+    <h2>Prompt Instructions Are <span>Not Guardrails</span></h2>
     <div class="grid-3">
       <div class="card red">
         <h3>1️⃣ Programmatic Tool Guardrail</h3>
@@ -588,13 +579,13 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
   </div>
 
   <!-- SLIDE 11: LIVE DEMO 3 -->
-  <div class="slide" data-slide="10" data-demo="/ai-concierge" data-notes="[26:30–32:00] LIVE DEMO 3 (Tab 3: Durable Eats AI Concierge). Press L to open the embedded demo! 1) Click the CDMX Taquería Orinoco or Campus Boba & Byte prompt chip. 2) Add items to cart and click Confirm Order — watch the Programmatic Guardrail trigger A2A :9002 automatically. 3) Trigger the >$100 Feast prompt, approve the Manager Gate, and watch the Child OrderWorkflow launch!">
+  <div class="slide" data-slide="10" data-demo="/ai-concierge" data-notes="LIVE DEMO 3 (Tab 3: Durable Eats AI Concierge). Press L to open the embedded demo! 1) Click the Taquería El Sol or Boba & Byte prompt chip. 2) Add items to cart and click Confirm Order — watch the Programmatic Guardrail trigger A2A :9002 automatically. 3) Trigger the >$100 Team Feast prompt, approve the Manager Gate, and watch the Child OrderWorkflow launch!">
     <div class="eyebrow">Live Demo 3 · Tab 3</div>
-    <h2 data-en="🤖 &quot;Durable Eats&quot; <span>Multi-Agent AI Concierge</span>" data-es="🤖 &quot;Durable Eats&quot; <span>Concierge Multi-Agente IA</span>">🤖 "Durable Eats" <span>Multi-Agent AI Concierge</span></h2>
+    <h2>🤖 "Durable Eats" <span>Multi-Agent AI Concierge</span></h2>
     <div class="grid-3">
       <div class="card">
-        <h3>🇲🇽 / 🎓 Local Catalogs</h3>
-        <p>Order <em>Tacos al Pastor</em> &amp; <em>Gringa de Pastor</em> from <strong>Taquería Orinoco CDMX</strong> or <em>Brown Sugar Boba</em> from <strong>Boba &amp; Byte Campus Lab</strong>.</p>
+        <h3>🌮 / 🎓 Local Catalogs</h3>
+        <p>Order <em>Tacos al Pastor</em> &amp; <em>Gringa de Pastor</em> from <strong>Taquería El Sol</strong> or <em>Brown Sugar Boba</em> from <strong>Boba &amp; Byte Campus Lab</strong>.</p>
       </div>
       <div class="card amber">
         <h3>💀 Crash It Mid-Turn</h3>
@@ -618,9 +609,9 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
   </div>
 
   <!-- SLIDE 12: Same Stack, Second Domain (CloudGuard SRE) -->
-  <div class="slide" data-slide="11" data-notes="[32:00–34:00] Act IV: Show that this isn't just for consumer chat apps. By swapping the catalog and A2A tools, the exact same Go ADK + A2A + A2UI + Temporal pattern powers an autonomous SRE Incident Commander.">
+  <div class="slide" data-slide="11" data-notes="Act IV: Show that this isn't just for consumer chat apps. By swapping the catalog and A2A tools, the exact same Go ADK + A2A + A2UI + Temporal pattern powers an autonomous SRE Incident Commander.">
     <div class="eyebrow">Act IV · Architectural Generality</div>
-    <h2 data-en="Same 4-Layer Stack → <span>AI SRE Incident Response</span>" data-es="El Mismo Stack → <span>Respuesta a Incidentes SRE con IA</span>">Same 4-Layer Stack → <span>AI SRE Incident Response</span></h2>
+    <h2>Same 4-Layer Stack → <span>AI SRE Incident Response</span></h2>
     <div class="grid-2">
       <div class="card">
         <h3>🤖 Tab 3: "Durable Eats" Concierge</h3>
@@ -644,9 +635,9 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
   </div>
 
   <!-- SLIDE 13: LIVE DEMO 4 -->
-  <div class="slide" data-slide="12" data-demo="/incident-sre" data-notes="[34:00–37:30] LIVE DEMO 4 (Tab 4: CloudGuard AI SRE Incident Commander). Press L to open the embedded demo! 1) Click Step 1 (or press F) to diagnose SEV-1 telemetry via A2A :9003. 2) Click Step 2 on the A2UI card to evaluate blast radius via A2A :9004. 3) Click Step 3, authorize the Commander HITL Gate, and watch RB-402 shift traffic to checkout-api-stable-v2.13.8 and drop p99 from 4,820ms to 42ms!">
+  <div class="slide" data-slide="12" data-demo="/incident-sre" data-notes="LIVE DEMO 4 (Tab 4: CloudGuard AI SRE Incident Commander). Press L to open the embedded demo! 1) Click Step 1 (or press F) to diagnose SEV-1 telemetry via A2A :9003. 2) Click Step 2 on the A2UI card to evaluate blast radius via A2A :9004. 3) Click Step 3, authorize the Commander HITL Gate, and watch RB-402 shift traffic to checkout-api-stable-v2.13.8 and drop p99 from 4,820ms to 42ms!">
     <div class="eyebrow">Live Demo 4 · Tab 4</div>
-    <h2 data-en="🚨 &quot;CloudGuard&quot; <span>AI SRE Incident Commander</span>" data-es="🚨 &quot;CloudGuard&quot; <span>Incident Commander SRE con IA</span>">🚨 "CloudGuard" <span>AI SRE Incident Commander</span></h2>
+    <h2>🚨 "CloudGuard" <span>AI SRE Incident Commander</span></h2>
     <div class="grid-3">
       <div class="card red">
         <h3>1️⃣ Diagnose Canary Spike</h3>
@@ -674,9 +665,9 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
   </div>
 
   <!-- SLIDE 14: Takeaways -->
-  <div class="slide" data-slide="13" data-notes="[37:30–40:00] Wrap up with the 4 takeaways and invite questions!">
+  <div class="slide" data-slide="13" data-notes="Wrap up with the 4 takeaways and invite questions!">
     <div class="eyebrow">Wrap-Up &amp; Q&amp;A</div>
-    <h2 data-en="4 Rules for <span>Production AI Agents in 2026</span>" data-es="4 Reglas para <span>Agentes de IA en Producción en 2026</span>">4 Rules for <span>Production AI Agents in 2026</span></h2>
+    <h2>4 Rules for <span>Production AI Agents</span></h2>
     <div class="grid-2">
       <div class="card green">
         <h3>✅ Architectural Takeaways</h3>
@@ -730,12 +721,12 @@ nix develop -c make demo</pre>
 </div>
 
 <div class="notes-drawer" id="notesDrawer">
-  <h4>🎙️ Speaker Notes &amp; Timing</h4>
+  <h4>🎙️ Speaker Notes</h4>
   <p id="notesText"></p>
 </div>
 
 <div class="slide-num" id="slideNum">1 / 14</div>
-<div class="nav-hint">← → Navigate · L Embed Live Demo · S Speaker Notes · G Slide Grid · T Stage Timer · E EN/ES · M Track</div>
+<div class="nav-hint">← → Navigate · L Embed Live Demo · G Slide Grid · S Speaker Notes</div>
 
 <script>
 const slides = document.querySelectorAll('.slide');
@@ -744,47 +735,6 @@ let current = 0;
 let notesOpen = false;
 let embedOpen = false;
 let gridOpen = false;
-let audience = 'both';
-let lang = 'en';
-
-// Stage Timer (35m target)
-let timerSeconds = 0;
-let timerInterval = null;
-
-function formatTimer(sec) {
-  const m = String(Math.floor(sec / 60)).padStart(2, '0');
-  const s = String(sec % 60).padStart(2, '0');
-  return `${m}:${s}`;
-}
-
-function updateTimerUI() {
-  const btn = document.getElementById('btnTimer');
-  const icon = timerInterval ? '⏸️' : '⏱️';
-  btn.textContent = `${icon} ${formatTimer(timerSeconds)}`;
-  btn.classList.toggle('timer-warn', timerSeconds >= 1800 && timerSeconds < 2100);
-  btn.classList.toggle('timer-over', timerSeconds >= 2100);
-}
-
-function toggleTimer(e) {
-  if (e) e.stopPropagation();
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  } else {
-    timerInterval = setInterval(() => {
-      timerSeconds++;
-      updateTimerUI();
-    }, 1000);
-  }
-  updateTimerUI();
-}
-
-function resetTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = null;
-  timerSeconds = 0;
-  updateTimerUI();
-}
 
 // Interactive Packet Tracer on Slide 3
 const TRACE_STEPS = [
@@ -828,37 +778,6 @@ function toggleNotes(e) {
   notesOpen = !notesOpen;
   document.getElementById('notesDrawer').classList.toggle('open', notesOpen);
   document.getElementById('btnNotes').classList.toggle('active', notesOpen);
-}
-
-function toggleLang(e) {
-  if (e) e.stopPropagation();
-  lang = lang === 'en' ? 'es' : 'en';
-  document.getElementById('btnLang').textContent = lang === 'en' ? '🌐 EN' : '🇲🇽 ES';
-  document.getElementById('btnLang').classList.toggle('active', lang === 'es');
-  document.querySelectorAll('[data-en]').forEach(el => {
-    el.innerHTML = el.getAttribute(lang === 'es' ? 'data-es' : 'data-en');
-  });
-}
-
-function setAudience(mode, e) {
-  if (e) e.stopPropagation();
-  audience = mode;
-  document.getElementById('btnBoth').classList.toggle('active', mode === 'both');
-  document.getElementById('btnUni').classList.toggle('active', mode === 'uni');
-  document.getElementById('btnCdmx').classList.toggle('active', mode === 'cdmx');
-
-  const label = document.getElementById('eventLabel');
-  const eyebrow = document.getElementById('slide1Eyebrow');
-  if (mode === 'uni') {
-    label.textContent = '🎓 University CS Guest Lecture';
-    eyebrow.textContent = 'University Computer Science Colloquium · Distributed Systems & AI Agents';
-  } else if (mode === 'cdmx') {
-    label.textContent = '🇲🇽 GDG DevFest Ciudad de México 2026';
-    eyebrow.textContent = 'GDG DevFest Ciudad de México 2026 · Cohost GDG Cloud Mexico City';
-  } else {
-    label.textContent = 'GDG DevFest CDMX 2026 & University CS';
-    eyebrow.textContent = 'GDG DevFest Ciudad de México 2026 · University CS Lecture Series';
-  }
 }
 
 function switchEmbed(url, btnId) {
@@ -945,15 +864,6 @@ document.addEventListener('keydown', e => {
     openEmbed(demoPath);
   } else if (e.key.toLowerCase() === 'g') {
     toggleGrid();
-  } else if (e.key === 'T' && e.shiftKey) {
-    resetTimer();
-  } else if (e.key.toLowerCase() === 't') {
-    toggleTimer();
-  } else if (e.key.toLowerCase() === 'e') {
-    toggleLang();
-  } else if (e.key.toLowerCase() === 'm') {
-    const next = audience === 'both' ? 'uni' : audience === 'uni' ? 'cdmx' : 'both';
-    setAudience(next);
   }
 });
 

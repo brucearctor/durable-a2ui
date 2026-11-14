@@ -23,7 +23,7 @@ function navigateTo(path: string) {
 
 const SCENARIOS: { id: Exclude<Scenario, null>; path: string; label: string; icon: string; tagline: string }[] = [
   { id: 'order', path: '/order', label: 'Order Tracking', icon: '🍕', tagline: 'Single A2UI surface, Fragile vs. Durable crash test' },
-  { id: 'approval', path: '/approval', label: 'Dual-Surface Approval', icon: '📋', tagline: 'DevFest CDMX & Campus Grants — 1 workflow, 2 role views' },
+  { id: 'approval', path: '/approval', label: 'Dual-Surface Approval', icon: '📋', tagline: 'Cloud Infra & Campus Grants — 1 workflow, 2 role views' },
   { id: 'ai-concierge', path: '/ai-concierge', label: 'Durable Eats Concierge', icon: '🤖', tagline: 'Go ADK + A2A (:9001/:9002) + Guardrail + HITL + Child WF' },
   { id: 'incident-sre', path: '/incident-sre', label: 'CloudGuard AI SRE', icon: '🚨', tagline: 'SEV-1 Canary Diagnosis & Rollback — Go ADK + A2A (:9003/:9004)' },
 ];
@@ -102,7 +102,7 @@ export default function App() {
       {scenario === 'incident-sre' && <IncidentCommander />}
       {scenario === null && (
         <div className="landing">
-          <p className="landing-prompt">Select a live demo scenario (University Talk & GDG DevFest CDMX 2026)</p>
+          <p className="landing-prompt">Select a live demo scenario</p>
           <div className="landing-cards">
             {SCENARIOS.map((s) => (
               <button

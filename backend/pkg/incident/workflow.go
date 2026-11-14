@@ -100,7 +100,7 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 			"commander":     commander,
 			"service":       input.ServiceName,
 			"runbook":       "RB-402: Shift 100% GKE traffic to checkout-api-stable-v2.13.8 & drain leaked AlloyDB tx",
-			"blast_radius":  "14,200 req/s across mx-central1 & us-central1 (Change Freeze Active)",
+			"blast_radius":  "14,200 req/s across us-central1 & us-east1 (Change Freeze Active)",
 			"slo_burn_rate": "18.4x",
 		}))
 	}

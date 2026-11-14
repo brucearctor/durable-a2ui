@@ -186,7 +186,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 		OnGetMenu: func(args GetMenuArgs) (GetMenuResult, error) {
 			queuedA2UI = append(queuedA2UI, BuildMenuSurface(args.Category)...)
 			return GetMenuResult{
-				Restaurant: "Durable Eats (CDMX & Campus)",
+				Restaurant: "Durable Eats (Local & Campus)",
 				Items:      MenuCatalog,
 			}, nil
 		},
@@ -331,7 +331,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 	// Create initial chat surface and greeting (only on first run before compaction)
 	if input.StreamState == nil {
 		_ = ui.Publish(a2ui.CreateSurface("chat", false))
-		publishChat("assistant", fmt.Sprintf("Hi %s! 👋 I'm your AI concierge at **Durable Eats** (powered by Go ADK + A2A + A2UI + Temporal). Want to see our **CDMX Taquería & Campus Boba** menu or order for your team?", customer))
+		publishChat("assistant", fmt.Sprintf("Hi %s! 👋 I'm your AI concierge at **Durable Eats** (powered by Go ADK + A2A + A2UI + Temporal). Want to see our **Taquería El Sol & Campus Boba** menu or order for your team?", customer))
 	}
 
 	for !sessionEnded {
@@ -515,7 +515,7 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 			})
 			childFuture := workflow.ExecuteChildWorkflow(childCtx, order.OrderWorkflow, order.OrderInput{
 				Customer: customer,
-				Address:  "DevFest / Campus Hub",
+				Address:  "123 Tech Campus Way",
 				Items:    orderItems,
 			})
 			// Wait for child workflow to start

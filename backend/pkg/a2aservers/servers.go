@@ -123,14 +123,14 @@ type RestaurantInfo struct {
 
 var RestaurantsCatalog = []RestaurantInfo{
 	{
-		Name:         "Taquería Orinoco CDMX",
-		Cuisine:      "Mexican Street Tacos (Roma Norte / Condesa)",
+		Name:         "Taquería El Sol",
+		Cuisine:      "Artisanal Mexican Street Tacos",
 		Rating:       4.9,
 		PriceRange:   "$",
 		DeliveryTime: "15 min",
 		Highlights:   []string{"Tacos al Pastor", "Gringa de Pastor", "Horchata Artesanal"},
 		Dietary:      []string{"gluten-free corn tortillas", "dairy-free options"},
-		Badge:        "🌮 CDMX DevFest Favorite",
+		Badge:        "🌮 Local Street Taco Favorite",
 	},
 	{
 		Name:         "Boba & Byte Campus Lab",
@@ -167,7 +167,7 @@ var RestaurantsCatalog = []RestaurantInfo{
 func RestaurantFinderServer(port int) *http.ServeMux {
 	card := &a2a.AgentCard{
 		Name:               "Restaurant & Campus Spot Finder Agent",
-		Description:        "Discovers top local restaurants across CDMX (DevFest) and University Campus spots by cuisine, dietary needs, and delivery speed.",
+		Description:        "Discovers top local restaurants and university campus dining spots by cuisine, dietary needs, and delivery speed.",
 		Version:            "1.0.0",
 		DefaultInputModes:  []string{"text"},
 		DefaultOutputModes: []string{"text"},
@@ -178,8 +178,8 @@ func RestaurantFinderServer(port int) *http.ServeMux {
 			{
 				ID:          "find_restaurants",
 				Name:        "Find Restaurants & Campus Spots",
-				Description: "Search CDMX and campus dining spots with ratings, ETAs, and signature dishes.",
-				Tags:        []string{"restaurants", "cdmx", "campus", "food"},
+				Description: "Search local and campus dining spots with ratings, ETAs, and signature dishes.",
+				Tags:        []string{"restaurants", "tacos", "campus", "food"},
 			},
 		},
 	}
@@ -188,8 +188,8 @@ func RestaurantFinderServer(port int) *http.ServeMux {
 		q := strings.ToLower(prompt)
 		var matches []RestaurantInfo
 		for _, r := range RestaurantsCatalog {
-			if strings.Contains(q, "taco") || strings.Contains(q, "mexic") || strings.Contains(q, "cdmx") || strings.Contains(q, "pastor") {
-				if strings.Contains(strings.ToLower(r.Name), "orinoco") {
+			if strings.Contains(q, "taco") || strings.Contains(q, "mexic") || strings.Contains(q, "sol") || strings.Contains(q, "pastor") {
+				if strings.Contains(strings.ToLower(r.Name), "sol") {
 					matches = append(matches, r)
 				}
 			} else if strings.Contains(q, "boba") || strings.Contains(q, "campus") || strings.Contains(q, "hack") || strings.Contains(q, "study") {
@@ -407,7 +407,7 @@ func TelemetryDiagnosticsServer(port int) *http.ServeMux {
 			"agent":              "cloudguard_telemetry_a2a",
 			"protocol":           "A2A JSON-RPC 2.0",
 			"service":            "checkout-api",
-			"region":             "us-central1 / mx-central1 (GKE Multi-Cluster)",
+			"region":             "us-central1 & us-east1 (GKE Multi-Cluster)",
 			"anomalous_revision": "checkout-api-canary-v2.14.0-rc3",
 			"baseline_revision":  "checkout-api-stable-v2.13.8",
 			"metrics": map[string]any{
@@ -458,8 +458,8 @@ func SecOpsPolicyServer(port int) *http.ServeMux {
 			"policy_check":            "PASS_WITH_HITL_GATE",
 			"risk_score":              "HIGH (Tier-0 Checkout Service)",
 			"change_freeze_active":    true,
-			"change_freeze_reason":    "Peak Event Window — DevFest CDMX & Campus Registration Live Traffic",
-			"affected_users_estimate": "14,200 req/s across mx-central1 & us-central1",
+			"change_freeze_reason":    "Peak Traffic Window — Global Launch & Live Registration Event",
+			"affected_users_estimate": "14,200 req/s across us-central1 & us-east1",
 			"slo_burn_rate":           "18.4x (Monthly 99.95% error budget exhausts in 24 minutes)",
 			"requires_human_approval": true,
 			"required_approver_role":  "Incident Commander (On-Call SRE Lead)",

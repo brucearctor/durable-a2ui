@@ -18,20 +18,20 @@ var MenuCatalog = []MenuItemInfo{
 	{
 		Name:        "Tacos al Pastor",
 		Price:       11.50,
-		Description: "Order of 4 CDMX street tacos (adobo pork, roasted pineapple, cilantro, nixtamal corn tortilla)",
-		Origin:      "Taquería Orinoco CDMX",
+		Description: "Order of 4 street tacos (adobo pork, roasted pineapple, cilantro, nixtamal corn tortilla)",
+		Origin:      "Taquería El Sol",
 	},
 	{
 		Name:        "Gringa de Pastor",
 		Price:       13.50,
 		Description: "Melted Oaxaca cheese & char-grilled al pastor on flour tortillas with salsa verde",
-		Origin:      "Taquería Orinoco CDMX",
+		Origin:      "Taquería El Sol",
 	},
 	{
 		Name:        "Horchata Artesanal",
 		Price:       4.50,
-		Description: "House-made CDMX rice water with Ceylon cinnamon & vanilla (500ml)",
-		Origin:      "Taquería Orinoco CDMX",
+		Description: "House-made rice water with Ceylon cinnamon & vanilla (500ml)",
+		Origin:      "Taquería El Sol",
 	},
 	{
 		Name:        "Brown Sugar Boba",
@@ -119,7 +119,7 @@ func BuildMenuSurface(filter string) []map[string]any {
 	rowIDs := make([]string, 0, len(MenuCatalog))
 	comps := []map[string]any{
 		{"id": "root", "component": "Card", "child": "menu_col"},
-		{"id": "menu_header", "component": "Text", "text": "🍽️ Durable Eats — CDMX & Campus Menu", "variant": "h3"},
+		{"id": "menu_header", "component": "Text", "text": "🍽️ Durable Eats — Local & Campus Menu", "variant": "h3"},
 		{"id": "menu_sub", "component": "Text", "text": "Click any item to add it to your durable workflow cart", "variant": "caption"},
 	}
 

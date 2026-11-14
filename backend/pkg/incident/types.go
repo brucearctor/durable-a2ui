@@ -35,7 +35,7 @@ func (in *IncidentInput) ApplyDefaults() {
 		in.CommanderName = "On-Call SRE"
 	}
 	if in.ServiceName == "" {
-		in.ServiceName = "checkout-api (mx-central1 & us-central1)"
+		in.ServiceName = "checkout-api (us-central1 & us-east1)"
 	}
 	if in.IncidentSummary == "" {
 		in.IncidentSummary = "SEV-1: HTTP 5xx spike (18.4%) & AlloyDB connection pool saturation after canary v2.14.0-rc3 rollout"
@@ -52,7 +52,7 @@ func BuildTelemetrySurface() []map[string]any {
 			"children":  []string{"tel_hdr", "tel_sub", "tel_m1", "tel_m2", "tel_m3", "tel_div", "tel_rc", "tel_btn"},
 		},
 		{"id": "tel_hdr", "component": "Text", "text": "📡 A2A Telemetry & Canary Diagnostics (:9003)", "variant": "h3"},
-		{"id": "tel_sub", "component": "Text", "text": "Cluster: GKE mx-central1 + us-central1 | Revision: checkout-api-canary-v2.14.0-rc3", "variant": "caption"},
+		{"id": "tel_sub", "component": "Text", "text": "Cluster: GKE us-central1 + us-east1 | Revision: checkout-api-canary-v2.14.0-rc3", "variant": "caption"},
 		{"id": "tel_m1", "component": "Text", "text": "🔴 HTTP 5xx Rate: 18.4% (baseline 0.02%) — 14,200 req/s affected", "variant": "body"},
 		{"id": "tel_m2", "component": "Text", "text": "🔴 p99 Latency: 4,820 ms | AlloyDB Connections: 200/200 (100% SATURATED)", "variant": "body"},
 		{"id": "tel_m3", "component": "Text", "text": "🎯 Root-Cause Confidence: 96% (Unclosed pgx tx in payment retry middleware)", "variant": "h4"},
@@ -83,7 +83,7 @@ func BuildRunbookSurface() []map[string]any {
 		},
 		{"id": "rb_hdr", "component": "Text", "text": "🛡️ A2A SecOps Blast-Radius & Change-Freeze Policy (:9004)", "variant": "h3"},
 		{"id": "rb_badge", "component": "Text", "text": "⚠️ POLICY STATUS: PASS_WITH_HITL_GATE (Tier-0 Checkout Service)", "variant": "caption"},
-		{"id": "rb_freeze", "component": "Text", "text": "🔒 Active Change Freeze: Peak Event Window (DevFest CDMX & Campus Live Traffic)", "variant": "body"},
+		{"id": "rb_freeze", "component": "Text", "text": "🔒 Active Change Freeze: Peak Traffic Launch Window", "variant": "body"},
 		{"id": "rb_burn", "component": "Text", "text": "🔥 SLO Burn Rate: 18.4x (Monthly 99.95% error budget exhausts in 24 min)", "variant": "body"},
 		{"id": "rb_plan", "component": "Text", "text": "📋 Approved Runbook RB-402: Shift 100% GKE Gateway weight to v2.13.8 + terminate idle AlloyDB transactions.", "variant": "h4"},
 		{

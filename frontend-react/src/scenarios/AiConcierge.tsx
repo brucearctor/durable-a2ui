@@ -37,7 +37,7 @@ const PROMPT_CHIPS = [
   { icon: <Pizza size={16} />, text: 'Show me the menu' },
   { icon: <Zap size={16} />, text: 'Order 4 Tacos al Pastor and 2 Horchata Artesanal' },
   { icon: <CakeSlice size={16} />, text: 'Add 2 Brown Sugar Boba and 2 Margherita Pizzas' },
-  { icon: <ShoppingCart size={16} />, text: 'DevFest Team Feast: 10 Tacos al Pastor' },
+  { icon: <ShoppingCart size={16} />, text: 'Team Feast: 10 Tacos al Pastor' },
 ];
 
 export default function AiConcierge() {
@@ -45,7 +45,7 @@ export default function AiConcierge() {
   const [devMode, setDevMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputText, setInputText] = useState('');
-  const [customerName, setCustomerName] = useState('DevFest / Campus Attendee');
+  const [customerName, setCustomerName] = useState('Alex Rivera');
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

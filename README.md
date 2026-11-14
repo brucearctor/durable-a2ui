@@ -1,6 +1,6 @@
 # The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything (All-Go Edition)
 
-This repository powers the 35–40 minute live conference talk and demo for both **University CS Students** and **GDG DevFest 2026 Ciudad de México (CDMX)**.
+This repository powers the live talk and interactive demos for **The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything**.
 
 Every backend component—workflows, multi-agent orchestration, remote A2A servers, A2UI v1.0 message builders, and the HTTP/SSE BFF—is written in **100% Go**:
 
@@ -19,10 +19,10 @@ Every backend component—workflows, multi-agent orchestration, remote A2A serve
    * Audience QR code sync via `:5174`.
 2. **Tab 2 — 📋 Dual-Surface Approval (`/approval`)**
    * One `approval.ApprovalWorkflow` publishing to two `workflowstreams` topics (`requester-ui` and `approver-ui`).
-   * Includes 1-click presets for **🇲🇽 DevFest CDMX Cloud & Speaker Grant (\$2,135)** and **🎓 University Campus GPU & Hackathon Grant (\$2,135)**.
+   * Includes 1-click presets for **☁️ Production AI & GPU Cluster Quota Grant (\$2,135)** and **🎓 University Campus GPU & Hackathon Grant (\$2,135)**.
 3. **Tab 3 — 🤖 "Durable Eats" AI Concierge (`/ai-concierge`)**
    * 4-agent ADK hierarchy (`concierge` → `menu_advisor`, `cart_manager`, `order_confirmer`).
-   * Calls 2 live Go A2A JSON-RPC 2.0 servers (`:9001` **Restaurant & Campus Spot Finder** featuring *Taquería Orinoco CDMX* & *Boba & Byte Campus Lab*, and `:9002` **Dietary & Allergy Safety Advisor**) wrapped via `googleadk.ActivityAsTool`.
+   * Calls 2 live Go A2A JSON-RPC 2.0 servers (`:9001` **Restaurant & Campus Spot Finder** featuring *Taquería El Sol* & *Boba & Byte Campus Lab*, and `:9002` **Dietary & Allergy Safety Advisor**) wrapped via `googleadk.ActivityAsTool`.
    * Features a **Programmatic Dietary Safety Guardrail** (blocks `confirm_order` in code until `:9002` A2A dietary verification completes), a **\$100 Manager HITL Approval Gate**, and a **Temporal Child Workflow** handoff to `OrderWorkflow`.
 4. **Tab 4 — 🚨 "CloudGuard" AI SRE Incident Commander (`/incident-sre`)**
    * 4-agent ADK SRE hierarchy (`incident_commander` → `telemetry_investigator`, `mitigation_planner`, `remediation_executor`).
@@ -42,20 +42,20 @@ nix develop -c ./scripts/run-demo.sh
 
 ---
 
-## 35–40 Minute Speaker Run-of-Show
+## Presentation & Demo Flow
 
-* **00:00 – 05:00 | The "Fragile Agent" Problem**: Why demos work on localhost and die in production; introducing the 4-layer stack (**ADK** = Brain, **A2A** = Remote Agent Mesh, **A2UI** = Generative UI Surface, **Temporal** = Durable Backbone).
-* **05:00 – 12:00 | Act 1 — Tab 1 (`🍕 Order Tracking`) & Tab 2 (`📋 Dual-Surface Approval`)**:
+* **Introduction — The "Fragile Agent" Problem**: Why demos work on localhost and die in production; introducing the 4-layer stack (**ADK** = Brain, **A2A** = Remote Agent Mesh, **A2UI** = Generative UI Surface, **Temporal** = Durable Backbone).
+* **Act I — Tab 1 (`🍕 Order Tracking`) & Tab 2 (`📋 Dual-Surface Approval`)**:
   * Show A2UI v1.0 JSON envelopes (`createSurface`, `updateComponents`, `updateDataModel`) in the **DevTools (`D`)** panel.
   * Switch between **Fragile** and **Durable** mode and click **💀 Kill Worker**.
-  * Open Tab 2, toggle between the **🎓 Campus Hackathon GPU Grant** and **🇲🇽 DevFest CDMX Cloud Grant** presets, and show one workflow driving two role-specific UIs (`requester-ui` and `approver-ui`).
-* **12:00 – 25:00 | Act 2 — Tab 3 (`🤖 Durable Eats Concierge`)**:
-  * Click **Show me the menu** → watch `concierge` transfer to `menu_advisor` and render an interactive A2UI menu card with *Taquería Orinoco CDMX* Tacos al Pastor and *Boba & Byte* Brown Sugar Boba.
-  * Click **DevFest Team Feast: 10 Tacos al Pastor** → watch `cart_manager` update the durable server-side cart (`\$115.00`).
+  * Open Tab 2, toggle between the **☁️ Production AI & GPU Cluster Grant** and **🎓 Campus Hackathon GPU Grant** presets, and show one workflow driving two role-specific UIs (`requester-ui` and `approver-ui`).
+* **Act II — Tab 3 (`🤖 Durable Eats Concierge`)**:
+  * Click **Show me the menu** → watch `concierge` transfer to `menu_advisor` and render an interactive A2UI menu card with *Taquería El Sol* Tacos al Pastor and *Boba & Byte* Brown Sugar Boba.
+  * Click **Team Feast: 10 Tacos al Pastor** → watch `cart_manager` update the durable server-side cart (`\$115.00`).
   * Click **✅ Confirm Order** on the A2UI cart card → watch the **Programmatic Safety Guardrail** block `confirm_order`, automatically call the `:9002` **Dietary Safety A2A Agent** over JSON-RPC 2.0, and then trigger the **\$100 Manager HITL Approval Banner**.
   * Click **💀 Kill Worker** while the Manager Approval Banner is waiting! Restart the worker, click **Approve**, and watch `ConciergeWorkflow` spawn `OrderWorkflow` as a **Child Workflow**.
-* **25:00 – 33:00 | Act 3 — Tab 4 (`🚨 CloudGuard AI SRE`)**:
+* **Act III — Tab 4 (`🚨 CloudGuard AI SRE`)**:
   * Show the same Go `googleadk` + `a2a-go` + `workflowstreams` architecture solving a Tier-0 GKE + AlloyDB production incident (`checkout-api-canary-v2.14.0-rc3`).
   * Press `F` (**Fast Forward Step**) through Telemetry (`:9003`), SecOps Policy (`:9004`), and Incident Commander HITL sign-off to execute Canary Rollback `RB-402`.
-* **33:00 – 38:00 | Under the Hood in Go & Q&A**:
+* **Wrap-Up — Under the Hood in Go & Q&A**:
   * Highlight `googleadk.NewContext(ctx)` (deterministic time, UUIDs, and tool fan-out), `googleadk.NewPlugin(...)`, `googleadk.ActivityAsTool(...)`, and `workflowstreams.NewTopic[map[string]any]`.

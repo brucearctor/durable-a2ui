@@ -14,23 +14,23 @@ interface ExpenseItem {
 }
 
 const PRESETS = {
-  devfest_cdmx: {
-    requester: 'Valeria Morales (GDG Cloud CDMX)',
-    title: 'DevFest CDMX 2026 — Speaker Travel & GKE L4 GPU Workshop Quota',
+  cloud_infra: {
+    requester: 'Sarah Chen (Platform Engineering Lead)',
+    title: 'Production AI Inference — GKE L4 GPU Cluster & AlloyDB Quota Grant',
     justification:
-      'Hosting live hands-on workshop on ADK + A2A + A2UI + Temporal in Ciudad de México for 250 cloud engineers, plus dedicated L4 GPU cluster quota.',
+      'Provisioning dedicated GKE L4 GPU inference nodes, AlloyDB read-replica capacity, and OpenTelemetry trace retention for multi-agent workloads.',
     items: [
-      { description: 'Round-trip flight to Ciudad de México (MEX)', amount: 680, category: 'Travel' },
-      { description: 'Hotel Condesa CDMX (3 nights)', amount: 720, category: 'Lodging' },
-      { description: 'GKE L4 GPU Workshop Cluster Quota', amount: 485, category: 'Cloud Compute' },
-      { description: 'Taquería Orinoco Team Catering & Swag', amount: 250, category: 'Events' },
+      { description: 'GKE L4 GPU Inference Node Pool (Multi-Zone)', amount: 680, category: 'Cloud Compute' },
+      { description: 'AlloyDB Read-Replica High-Availability Pool', amount: 720, category: 'Database' },
+      { description: 'OpenTelemetry & Distributed Trace Retention Quota', amount: 485, category: 'Observability' },
+      { description: 'On-Call Engineering Launch War-Room Catering', amount: 250, category: 'Operations' },
     ],
   },
   campus_hackathon: {
     requester: 'Alex Rivera (ACM Student Chapter Lead)',
     title: 'University AI Hackathon — GPU Compute Grant & Hardware Kit',
     justification:
-      '48-hour university student hackathon building durable multi-agent systems with Go, ADK, A2A, and Temporal.',
+      'University student hackathon building durable multi-agent systems with Go, ADK, A2A, and Temporal.',
     items: [
       { description: 'Cloud L4 GPU Credits for 40 Student Teams', amount: 950, category: 'Cloud Compute' },
       { description: 'Raspberry Pi 5 & Edge AI Robotics Kits (×6)', amount: 660, category: 'Hardware' },
@@ -53,13 +53,13 @@ export default function ApprovalWorkflow() {
     }
   }, [error]);
 
-  const [presetKey, setPresetKey] = useState<'devfest_cdmx' | 'campus_hackathon'>('devfest_cdmx');
-  const [requester, setRequester] = useState(PRESETS.devfest_cdmx.requester);
-  const [title, setTitle] = useState(PRESETS.devfest_cdmx.title);
-  const [justification, setJustification] = useState(PRESETS.devfest_cdmx.justification);
-  const [items, setItems] = useState<ExpenseItem[]>(PRESETS.devfest_cdmx.items);
+  const [presetKey, setPresetKey] = useState<'cloud_infra' | 'campus_hackathon'>('cloud_infra');
+  const [requester, setRequester] = useState(PRESETS.cloud_infra.requester);
+  const [title, setTitle] = useState(PRESETS.cloud_infra.title);
+  const [justification, setJustification] = useState(PRESETS.cloud_infra.justification);
+  const [items, setItems] = useState<ExpenseItem[]>(PRESETS.cloud_infra.items);
 
-  const applyPreset = (key: 'devfest_cdmx' | 'campus_hackathon') => {
+  const applyPreset = (key: 'cloud_infra' | 'campus_hackathon') => {
     setPresetKey(key);
     const p = PRESETS[key];
     setRequester(p.requester);
@@ -173,10 +173,10 @@ export default function ApprovalWorkflow() {
           <div className="mode-toggle" style={{ marginBottom: '14px' }}>
             <button
               type="button"
-              className={`mode-btn ${presetKey === 'devfest_cdmx' ? 'active durable' : ''}`}
-              onClick={() => applyPreset('devfest_cdmx')}
+              className={`mode-btn ${presetKey === 'cloud_infra' ? 'active durable' : ''}`}
+              onClick={() => applyPreset('cloud_infra')}
             >
-              🇲🇽 DevFest CDMX Cloud & Speaker Grant
+              ☁️ Production AI & GPU Cluster Grant
             </button>
             <button
               type="button"

@@ -20,8 +20,8 @@ export default function IncidentCommander() {
   const [devMode, setDevMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputText, setInputText] = useState('');
-  const [commanderName, setCommanderName] = useState('On-Call SRE Lead (CDMX / Campus)');
-  const [serviceName, setServiceName] = useState('checkout-api (mx-central1 & us-central1 GKE)');
+  const [commanderName, setCommanderName] = useState('On-Call SRE Lead');
+  const [serviceName, setServiceName] = useState('checkout-api (us-central1 & us-east1 GKE)');
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
