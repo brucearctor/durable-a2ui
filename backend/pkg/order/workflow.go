@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"go.temporal.io/sdk/contrib/workflowstreams"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
+
+	"github.com/ab/durable-a2ui/backend/pkg/a2ui"
 )
 
 var orderStages = []struct {
@@ -21,7 +22,7 @@ var orderStages = []struct {
 }
 
 func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
-	stream, err := workflowstreams.NewWorkflowStream(ctx, input.StreamState)
+	stream, err := a2ui.NewStream(ctx, input.StreamState)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +55,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 	ffCh := workflow.GetSignalChannel(ctx, "fast_forward")
 	cancelCh := workflow.GetSignalChannel(ctx, "cancel_order")
 
-	fastForwardPending := false
+	fastForwardCount := 0
 	drainSignals := func() {
 		for {
 			var v any
@@ -71,7 +72,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 				continue
 			}
 			if ffCh.ReceiveAsync(&v) {
-				fastForwardPending = true
+				fastForwardCount++
 				continue
 			}
 			if cancelCh.ReceiveAsync(&v) {
@@ -142,6 +143,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 		}
 
 		if stg.delay > 0 {
+			drainSignals()
 			waitDur := stg.delay
 			if state.Rushed {
 				waitDur = waitDur / 2
@@ -150,7 +152,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 			timerFuture := workflow.NewTimer(timerCtx, waitDur)
 			timerFired := false
 
-			for !timerFired && !fastForwardPending && !state.Cancelled {
+			for !timerFired && fastForwardCount == 0 && !state.Cancelled {
 				sel := workflow.NewSelector(ctx)
 				sel.AddFuture(timerFuture, func(f workflow.Future) {
 					timerFired = true
@@ -171,7 +173,7 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 				sel.AddReceive(ffCh, func(c workflow.ReceiveChannel, more bool) {
 					var v any
 					c.Receive(ctx, &v)
-					fastForwardPending = true
+					fastForwardCount++
 				})
 				sel.AddReceive(cancelCh, func(c workflow.ReceiveChannel, more bool) {
 					var v any
@@ -188,7 +190,9 @@ func OrderWorkflow(ctx workflow.Context, input OrderInput) (string, error) {
 				sel.Select(ctx)
 			}
 			cancelTimer()
-			fastForwardPending = false
+			if fastForwardCount > 0 {
+				fastForwardCount--
+			}
 
 			if state.Cancelled {
 				return "cancelled", nil

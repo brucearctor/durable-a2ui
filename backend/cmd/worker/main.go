@@ -31,6 +31,10 @@ func main() {
 	}
 	defer c.Close()
 
+	// Disable sticky workflow cache so SIGKILL crash-recovery on stage
+	// fails over to the restarted worker with zero 5s sticky-queue delay.
+	worker.SetStickyWorkflowCacheSize(0)
+
 	// 1. Order Tracking Worker
 	orderWorker := worker.New(c, order.TaskQueue, worker.Options{})
 	orderWorker.RegisterWorkflow(order.OrderWorkflow)

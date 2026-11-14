@@ -3,13 +3,14 @@ package approval
 import (
 	"time"
 
-	"go.temporal.io/sdk/contrib/workflowstreams"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
+
+	"github.com/ab/durable-a2ui/backend/pkg/a2ui"
 )
 
 func ApprovalWorkflow(ctx workflow.Context, input ApprovalInput) (string, error) {
-	stream, err := workflowstreams.NewWorkflowStream(ctx, input.StreamState)
+	stream, err := a2ui.NewStream(ctx, input.StreamState)
 	if err != nil {
 		return "", err
 	}

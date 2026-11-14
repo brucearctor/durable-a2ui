@@ -1,15 +1,51 @@
 package a2ui
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
+
+	commonpb "go.temporal.io/api/common/v1"
+	"go.temporal.io/sdk/contrib/workflowstreams"
+	"go.temporal.io/sdk/converter"
+	"go.temporal.io/sdk/workflow"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
-	Version        = "1.0"
-	BasicCatalogID = "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"
+	Version              = "1.0"
+	BasicCatalogID       = "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"
+	StreamStateQueryName = "a2ui_stream_state"
 )
+
+func NewStream(ctx workflow.Context, priorState *workflowstreams.WorkflowStreamState) (*workflowstreams.WorkflowStream, error) {
+	stream, err := workflowstreams.NewWorkflowStream(ctx, priorState)
+	if err != nil {
+		return nil, err
+	}
+	_ = workflow.SetQueryHandler(ctx, StreamStateQueryName, func() (*workflowstreams.WorkflowStreamState, error) {
+		return stream.GetState(15 * time.Minute)
+	})
+	return stream, nil
+}
+
+func DecodeWireItem(wire string, dc converter.DataConverter) (any, error) {
+	b, err := base64.StdEncoding.DecodeString(wire)
+	if err != nil {
+		return nil, err
+	}
+	payload := &commonpb.Payload{}
+	if err := proto.Unmarshal(b, payload); err != nil {
+		return nil, err
+	}
+	var val any
+	if err := dc.FromPayload(payload, &val); err != nil {
+		return nil, err
+	}
+	return val, nil
+}
 
 func CreateSurface(surfaceID string, sendDataModel bool) map[string]any {
 	cs := map[string]any{

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"go.temporal.io/sdk/contrib/googleadk"
-	"go.temporal.io/sdk/contrib/workflowstreams"
 	"go.temporal.io/sdk/workflow"
 	"google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/runner"
@@ -25,7 +24,7 @@ var SREDemoMessages = []string{
 func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error) {
 	input.ApplyDefaults()
 
-	stream, err := workflowstreams.NewWorkflowStream(ctx, input.StreamState)
+	stream, err := a2ui.NewStream(ctx, input.StreamState)
 	if err != nil {
 		return "", err
 	}

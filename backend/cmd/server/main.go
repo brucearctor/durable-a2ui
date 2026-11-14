@@ -25,6 +25,7 @@ import (
 	"go.temporal.io/sdk/worker"
 
 	"github.com/ab/durable-a2ui/backend/pkg/a2aservers"
+	"github.com/ab/durable-a2ui/backend/pkg/a2ui"
 	"github.com/ab/durable-a2ui/backend/pkg/approval"
 	"github.com/ab/durable-a2ui/backend/pkg/concierge"
 	"github.com/ab/durable-a2ui/backend/pkg/incident"
@@ -137,6 +138,7 @@ func (wm *WorkerManager) Status() (bool, int) {
 }
 
 func startInProcWorkers(c client.Client) ([]worker.Worker, error) {
+	worker.SetStickyWorkflowCacheSize(0)
 	orderW := worker.New(c, order.TaskQueue, worker.Options{})
 	orderW.RegisterWorkflow(order.OrderWorkflow)
 	orderW.RegisterActivity(&order.Activities{})
@@ -495,9 +497,10 @@ func main() {
 			}
 		}()
 
+		nextOffset := int64(lastEventID + 1)
 		for item, err := range sc.Subscribe(ctx, workflowstreams.SubscribeOptions{
 			Topics:       []string{topic},
-			FromOffset:   int64(lastEventID + 1),
+			FromOffset:   nextOffset,
 			PollCooldown: 200 * time.Millisecond,
 		}) {
 			if err != nil {
@@ -514,11 +517,33 @@ func main() {
 					_, _ = fmt.Fprintf(w, "id: %d\ndata: %s\n\n", item.Offset, string(b))
 					flusher.Flush()
 					writeMu.Unlock()
+					if item.Offset+1 > nextOffset {
+						nextOffset = item.Offset + 1
+					}
 				}
 			}
 		}
 
 		if ctx.Err() == nil {
+			if qv, qerr := tc.QueryWorkflow(ctx, workflowID, "", a2ui.StreamStateQueryName); qerr == nil {
+				var st workflowstreams.WorkflowStreamState
+				if qv.Get(&st) == nil {
+					for i, wi := range st.Log {
+						globalOffset := st.BaseOffset + int64(i)
+						if globalOffset < nextOffset || wi.Topic != topic {
+							continue
+						}
+						if val, derr := a2ui.DecodeWireItem(wi.Data, dc); derr == nil {
+							b, _ := json.Marshal(val)
+							writeMu.Lock()
+							_, _ = fmt.Fprintf(w, "id: %d\ndata: %s\n\n", globalOffset, string(b))
+							flusher.Flush()
+							writeMu.Unlock()
+							nextOffset = globalOffset + 1
+						}
+					}
+				}
+			}
 			writeMu.Lock()
 			_, _ = fmt.Fprintf(w, "event: done\ndata: {}\n\n")
 			flusher.Flush()
@@ -605,6 +630,11 @@ func main() {
 		wfID := r.PathValue("workflow_id")
 		sig := r.PathValue("signal_name")
 		if err := tc.SignalWorkflow(r.Context(), wfID, "", sig, nil); err != nil {
+			errLower := strings.ToLower(err.Error())
+			if strings.Contains(errLower, "not found") || strings.Contains(errLower, "completed") {
+				writeJSON(w, map[string]any{"ok": true, "completed": true})
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -32,7 +32,7 @@ var DemoMessages = []string{
 func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, error) {
 	input.ApplyDefaults()
 
-	stream, err := workflowstreams.NewWorkflowStream(ctx, input.StreamState)
+	stream, err := a2ui.NewStream(ctx, input.StreamState)
 	if err != nil {
 		return "", err
 	}
