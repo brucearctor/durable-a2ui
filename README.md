@@ -7,7 +7,7 @@ Every backend component—workflows, multi-agent orchestration, remote A2A serve
 * **🧠 Agent Orchestration (`ADK-Go v2.7.1`)**: `google.golang.org/adk/v2` + `go.temporal.io/sdk/contrib/googleadk v0.3.0` (`googleadk.NewPlugin`, `googleadk.NewContext`, `googleadk.NewModel`, `googleadk.ActivityAsTool`, `googleadk.ExportSession` / `ImportSession`).
 * **🔗 Agent-to-Agent Protocol (`A2A-Go v2.8.0`)**: `github.com/a2aproject/a2a-go/v2` (`a2asrv.NewJSONRPCHandler`, `a2asrv.NewStaticAgentCardHandler`, `agentcard.DefaultResolver`, `a2aclient.NewFromCard`) running 4 real HTTP JSON-RPC 2.0 servers on `:9001`–`:9004`.
 * **🎨 Agent-to-UI Protocol (`A2UI v1.0`)**: Declarative component trees (`createSurface`, `updateComponents`, `updateDataModel`) with `@a2ui/react v0.15.0` & `@a2ui/web_core v0.15.0` streamed over `go.temporal.io/sdk/contrib/workflowstreams v0.1.1` topics (`a2ui`, `requester-ui`, `approver-ui`).
-* **⏳ Durable Execution (`Temporal SDK v1.50.0`)**: Server-side state, programmatic guardrails, human-in-the-loop (HITL) approval gates, child workflows, and live `SIGKILL` crash recovery.
+* **⏳ Durable Execution (`Temporal SDK v1.51.0`)**: Server-side state, programmatic guardrails, human-in-the-loop (HITL) approval gates, child workflows, and live `SIGKILL` crash recovery.
 
 ---
 

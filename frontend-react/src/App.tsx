@@ -80,7 +80,7 @@ export default function App() {
           <span className="tech-badge">🧠 ADK-Go v2.7</span>
           <span className="tech-badge">🔗 A2A v2.8</span>
           <span className="tech-badge">⚡ A2UI v1.0</span>
-          <span className="tech-badge">⏳ Temporal v1.50</span>
+          <span className="tech-badge">⏳ Temporal v1.51</span>
           <a
             className="tech-badge"
             href="/slides"

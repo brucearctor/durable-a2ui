@@ -284,7 +284,7 @@ code,pre{font-family:'JetBrains Mono',monospace}
     <div class="eyebrow">Distributed Systems &amp; AI Agents · All-Go Architecture</div>
     <h1>The Agent Interoperability Stack: ADK + A2A + A2UI — and Why Durability Changes Everything</h1>
     <div class="subtitle">
-      How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK v2.7</strong>), collaborate across services (<strong>A2A v2.8</strong>), stream rich declarative interfaces (<strong>A2UI v1.0</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal v1.50</strong>).
+      How to build multi-agent systems in pure <strong>Go</strong> where agents reason (<strong>ADK v2.7</strong>), collaborate across services (<strong>A2A v2.8</strong>), stream rich declarative interfaces (<strong>A2UI v1.0</strong>), and survive <code>kill -9</code> crashes without losing a single byte (<strong>Temporal v1.51</strong>).
     </div>
     <div class="badge-row">
       <div class="tech-badge">🧠 <code>google.golang.org/adk/v2 v2.7.1</code></div>
@@ -360,7 +360,7 @@ code,pre{font-family:'JetBrains Mono',monospace}
         <div class="layer-title">Temporal Durable Execution</div>
       </div>
       <div class="layer-desc">Event-sourced replay for ADK sessions + durable SSE streaming via <code>workflowstreams</code> with automatic <code>Last-Event-ID</code> catch-up.</div>
-      <div class="layer-pkg">sdk v1.50 + googleadk v0.3</div>
+      <div class="layer-pkg">sdk v1.51 + googleadk v0.3</div>
     </div>
 
     <div class="flow-stepper" onclick="event.stopPropagation()">
@@ -675,7 +675,7 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
           <li><strong>1. Separate Structure from State (A2UI v1.0):</strong> Send component trees once; stream lightweight <code>@path</code> JSON Pointer data-model deltas.</li>
           <li><strong>2. Standardize Agent Boundaries (A2A v2.8):</strong> Discover specialist agents via <code>/.well-known/agent-card.json</code> and communicate over JSON-RPC 2.0.</li>
           <li><strong>3. Enforce Guardrails in Code, Not Prompts:</strong> Check safety invariants and human approval gates deterministically in Go before executing side effects.</li>
-          <li><strong>4. Make Every Turn Durable (Temporal v1.50):</strong> With <code>googleadk</code> + <code>workflowstreams</code>, worker crashes and browser refreshes become non-events.</li>
+          <li><strong>4. Make Every Turn Durable (Temporal v1.51):</strong> With <code>googleadk</code> + <code>workflowstreams</code>, worker crashes and browser refreshes become non-events.</li>
         </ul>
       </div>
       <div class="card">

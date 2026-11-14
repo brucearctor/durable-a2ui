@@ -58,7 +58,7 @@
   - **ADK (`google.golang.org/adk/v2 v2.7.1`)** gives your agent a **brain**.
   - **A2A (`github.com/a2aproject/a2a-go/v2 v2.8.0`)** gives it **colleagues**.
   - **A2UI (`v1.0` + `@a2ui/react v0.15.0`)** gives it a **face**.
-  - **Temporal (`v1.50.0` + `googleadk v0.3.0` + `workflowstreams v0.1.1`)** gives it a **spine**.
+  - **Temporal (`v1.51.0` + `googleadk v0.3.0` + `workflowstreams v0.1.1`)** gives it a **spine**.
 
 ### Act II-A: Declarative A2UI v1.0 + Durable Streams (Slides 4–5 + Demo 1)
 - **Concept:** Send the `A2UI v1.0` component tree once (`createSurface` + `updateComponents`), then stream tiny JSON Pointer (`@path`) deltas via `updateDataModel`.

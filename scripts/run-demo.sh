@@ -29,7 +29,7 @@ trap cleanup EXIT INT TERM
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  The Agent Interoperability Stack (All-Go Edition)${NC}"
-echo -e "${CYAN}  ADK-Go v2.7.1 × A2A v2.8.0 × A2UI v1.0 × Temporal v1.50.0${NC}"
+echo -e "${CYAN}  ADK-Go v2.7.1 × A2A v2.8.0 × A2UI v1.0 × Temporal v1.51.0${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 PORTS="7233 8000 8233 9001 9002 9003 9004 5173 5174"
