@@ -9,17 +9,27 @@
 1. **Choose Online vs. Offline Mode**
    - **Live Gemini (`gemini-2.5-flash`):** Export `GOOGLE_API_KEY` in `.env` (automatically falls back to the deterministic multi-agent engine if venue Wi-Fi drops).
    - **100% Offline Stage-Safe Mode:** Set `OFFLINE_MODE=true` in `.env` to run all 4 ADK sub-agent transfers, A2A JSON-RPC 2.0 calls (`:9001`–`:9004`), programmatic guardrails, and A2UI `v1.0` surfaces with zero external network dependency.
-2. **Start the Full Stack**
+2. **Verify & Start the Full Stack**
    ```bash
+   nix develop -c make e2e
    nix develop -c make demo
    ```
-3. **Open Browser Tabs (or Run Everything Inside the Slide Deck)**
+3. **Audience Mobile QR & Tunnel Setup (For Live Voting & Mobile Cutoff Demo)**
+   - In a second terminal, start the Cloudflare Tunnel for the audience kiosk (port 5174):
+     ```bash
+     nix develop -c ./scripts/tunnel.sh 5174
+     ```
+   - Copy the public HTTPS URL from terminal output (e.g., `https://random-subdomain.trycloudflare.com`).
+   - Set `PUBLIC_URL=https://random-subdomain.trycloudflare.com` in `.env` (or click **Share Live** in the UI and click **Set Public Tunnel URL** to paste it).
+   - Now any QR code projected on stage is 100% scannable from mobile phones in the auditorium!
+4. **Open Browser Tabs (or Run Everything Inside the Slide Deck)**
    - **Tab A — Slide Deck:** `http://localhost:8000/slides`
      - Press `L` on any demo slide to launch the live demo or Temporal Web UI inline.
      - Press `S` to toggle the Speaker Notes drawer.
      - Press `G` to open the Slide Overview grid.
    - **Tab B — Presenter UI:** `http://localhost:5173`
-   - **Tab C — Temporal Web UI:** `http://localhost:8233`
+   - **Tab C — Audience Phone Kiosk:** `http://localhost:5174` (or public tunnel URL)
+   - **Tab D — Temporal Web UI:** `http://localhost:8233`
 
 ---
 
@@ -39,13 +49,14 @@
 
 | Key | Action |
 | :--- | :--- |
-| `1` / `2` / `3` / `4` | Switch between Scenarios 1–4 |
-| `D` | Toggle **DevTools Panel** (live A2UI `v1.0` frames, token/cost metrics, ADK & A2A trace) |
+| `1` / `2` / `3` / `4` / `5` | Switch between Scenarios 1–5 |
+| `D` | Toggle **DevTools Panel** (live A2UI `v1.0` frames, Protocol X-Ray, token/cost metrics, ADK & A2A trace) |
 | `K` | **Kill Worker (`SIGKILL`)** — crashes `./bin/worker` process to prove durability |
 | `F` | **Fast-Forward** next workflow stage or next demo prompt |
+| `U` | **Hot-Upgrade Schema (`v1 ↔ v2`)** in Parallel A2A Council (Tab 5) |
 | `R` | Trigger Rush Order signal (Tab 1) |
 | `C` | Cancel Order signal (Tab 1) |
-| `A` / `X` | Approve (`A`) or Reject (`X`) in Dual-Surface Approval (Tab 2) |
+| `A` / `X` | Approve (`A`) or Reject (`X`) in Dual-Surface Approval (Tab 2) & Parallel Council (Tab 5) |
 | `N` | Reset / Start New Session |
 
 ---
@@ -95,7 +106,17 @@
   3. Click **Step 2 (`Evaluate Blast Radius`)** → `🛡️ Mitigation Planner` calls **A2A `:9004`** (`PASS_WITH_HITL_GATE`) and renders Runbook `RB-402`.
   4. Click **Step 3 (`Execute Canary Rollback RB-402`)** → triggers the **Incident Commander HITL Gate**, click **✅ Authorize Rollback**, and watch the post-remediation A2UI verification card confirm `5xx: 18.4% → 0.01%` and `p99: 4,820ms → 42ms`.
 
-### Wrap-Up & Q&A (Slide 14)
+### Act V: Parallel A2A Fan-Out (`workflow.Go`) & Live `v1 → v2` Schema Upgrade (Slide 14 + Demo 5)
+- **Concept:**
+  - **Option A (`workflow.Go` Fan-Out):** Spawn 3 concurrent A2A specialist evaluations (`:9003` Reliability, `:9004` SecOps, `:9001` FinOps) and stream each specialist card onto `council-board` as soon as it finishes.
+  - **Option C (`workflow.GetVersion` + Live Signal):** Upgrade an in-flight workflow's A2UI surface from `v1` (Compact Summary) to `v2` (Executive Scorecard) without restarting the workflow or losing state.
+- **Live Demo 5 (Tab 5 — Parallel A2A Council & Live Schema Upgrade):**
+  1. Press `5` to open Tab 5. Click **⚡ Simulate A2A 503 Outage** so all 4 A2A servers return `503 Service Unavailable`.
+  2. Click **🚀 Fan-Out Parallel A2A Council** — point out that all 3 concurrent activities are retrying safely in Temporal while A2A is down.
+  3. Click **🔥 A2A 503 Outage Active (Click to Heal)** — all 3 specialists immediately complete! Expand **🔬 Protocol X-Ray Inspector** to show `⚡ Recovered on Attempt #N` alongside the raw `/.well-known/agent-card.json` and JSON-RPC `message/send` payloads.
+  4. Press `U` (or click **🔼 Hot-Upgrade to v2 Executive Scorecard**) — watch `council-verdict` hot-swap from `v1` Compact Layout to `v2` Executive Scorecard mid-flight, then press `A` to approve rollout.
+
+### Wrap-Up & Q&A (Slide 15)
 - Recap the 4 rules:
   1. **Separate Structure from State (`A2UI v1.0`)**
   2. **Standardize Agent Boundaries (`A2A JSON-RPC 2.0`)**

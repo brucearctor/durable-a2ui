@@ -306,15 +306,31 @@ func IncidentWorkflow(ctx workflow.Context, input IncidentInput) (string, error)
 					}
 					if part.FunctionResponse != nil {
 						fnName := part.FunctionResponse.Name
+						var xray any
+						if part.FunctionResponse.Response != nil {
+							xray = part.FunctionResponse.Response["xray"]
+						}
 						switch fnName {
 						case "a2a_diagnose_telemetry":
 							telemetryChecked = true
-							publishTrace("function_response", map[string]any{"function": fnName, "status": "allowed"})
-							queuedA2UI = append(queuedA2UI, BuildTelemetrySurface()...)
+							telMsgs := BuildTelemetrySurface()
+							publishTrace("function_response", map[string]any{
+								"function":      fnName,
+								"status":        "allowed",
+								"xray":          xray,
+								"a2ui_payloads": telMsgs,
+							})
+							queuedA2UI = append(queuedA2UI, telMsgs...)
 						case "a2a_evaluate_blast_radius":
 							policyChecked = true
-							publishTrace("function_response", map[string]any{"function": fnName, "status": "allowed"})
-							queuedA2UI = append(queuedA2UI, BuildRunbookSurface()...)
+							rbMsgs := BuildRunbookSurface()
+							publishTrace("function_response", map[string]any{
+								"function":      fnName,
+								"status":        "allowed",
+								"xray":          xray,
+								"a2ui_payloads": rbMsgs,
+							})
+							queuedA2UI = append(queuedA2UI, rbMsgs...)
 						}
 					}
 				}

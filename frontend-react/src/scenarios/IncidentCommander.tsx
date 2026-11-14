@@ -5,8 +5,9 @@ import { A2uiSurface } from '@a2ui/react';
 import { ShieldAlert, Activity, ShieldCheck, Rocket, CheckCircle, ShieldX, Send, FastForward, RefreshCw, Loader, Zap } from 'lucide-react';
 import { useWorkflowStream } from '../hooks/useWorkflowStream';
 import type { StreamOptions } from '../hooks/useWorkflowStream';
-import { StatusBadge, ConnectionBanner } from '../components/shared';
+import { StatusBadge, ConnectionBanner, QRShare } from '../components/shared';
 import { useWorkerStatus, WorkerKillButton, WorkerDeadOverlay } from '../components/WorkerStatus';
+import { A2AChaosToggle, ProtocolXRayStrip } from '../components/ProtocolXRay';
 import DevToolsPanel from '../components/DevToolsPanel';
 
 const SRE_PROMPTS = [
@@ -43,7 +44,17 @@ export default function IncidentCommander() {
   }, [workflowId]);
 
   const { surfaces, status, sendSignal, messages } = useWorkflowStream(workflowId, streamOptions);
-  const { workerAlive, killing, restarting, killWorker, restartWorker, downSince } = useWorkerStatus();
+  const {
+    workerAlive,
+    killing,
+    restarting,
+    killWorker,
+    restartWorker,
+    downSince,
+    a2aOutage,
+    togglingChaos,
+    toggleA2AChaos,
+  } = useWorkerStatus();
 
   const workflowIdRef = useRef(workflowId);
   workflowIdRef.current = workflowId;
@@ -262,7 +273,9 @@ export default function IncidentCommander() {
           >
             <FastForward size={14} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> Fast Forward Step
           </button>
+          <A2AChaosToggle outage={a2aOutage} toggling={togglingChaos} onToggle={toggleA2AChaos} />
           <WorkerKillButton onKill={killWorker} killing={killing} workerAlive={workerAlive} />
+          <QRShare workflowId={workflowId} />
           <button className="ctrl-btn" onClick={resetDemo} title="New incident (N)">
             <RefreshCw size={14} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> New Incident
           </button>
@@ -272,6 +285,7 @@ export default function IncidentCommander() {
         </div>
 
         <ConnectionBanner status={status} messageCount={messages.length} />
+        <ProtocolXRayStrip messages={messages} />
 
         {approvalState?.status === 'pending' && (
           <div className="approval-banner">

@@ -3,9 +3,10 @@ import OrderTracking from './scenarios/OrderTracking';
 import ApprovalWorkflow from './scenarios/ApprovalWorkflow';
 import AiConcierge from './scenarios/AiConcierge';
 import IncidentCommander from './scenarios/IncidentCommander';
+import ParallelCouncil from './scenarios/ParallelCouncil';
 import './App.css';
 
-type Scenario = 'order' | 'approval' | 'ai-concierge' | 'incident-sre' | null;
+type Scenario = 'order' | 'approval' | 'ai-concierge' | 'incident-sre' | 'council' | null;
 
 function getRouteFromPath(): Scenario {
   const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
@@ -13,6 +14,7 @@ function getRouteFromPath(): Scenario {
   if (path === 'approval') return 'approval';
   if (path === 'ai-concierge') return 'ai-concierge';
   if (path === 'incident-sre') return 'incident-sre';
+  if (path === 'council') return 'council';
   return null;
 }
 
@@ -23,9 +25,10 @@ function navigateTo(path: string) {
 
 const SCENARIOS: { id: Exclude<Scenario, null>; path: string; label: string; icon: string; tagline: string }[] = [
   { id: 'order', path: '/order', label: 'Order Tracking', icon: '🍕', tagline: 'Single A2UI surface, Fragile vs. Durable crash test' },
-  { id: 'approval', path: '/approval', label: 'Dual-Surface Approval', icon: '📋', tagline: 'Cloud Infra & Campus Grants — 1 workflow, 2 role views' },
+  { id: 'approval', path: '/approval', label: 'Dual-Surface & Quorum', icon: '📋', tagline: 'Cloud Infra & Campus Grants — 2 role views + Room Quorum' },
   { id: 'ai-concierge', path: '/ai-concierge', label: 'Durable Eats Concierge', icon: '🤖', tagline: 'Go ADK + A2A (:9001/:9002) + Guardrail + HITL + Child WF' },
   { id: 'incident-sre', path: '/incident-sre', label: 'CloudGuard AI SRE', icon: '🚨', tagline: 'SEV-1 Canary Diagnosis & Rollback — Go ADK + A2A (:9003/:9004)' },
+  { id: 'council', path: '/council', label: 'Parallel Council & v2 Upgrade', icon: '⚡', tagline: 'Concurrent workflow.Go A2A Fan-Out + Live v1 → v2 Schema Swap' },
 ];
 
 function ScenarioTabs({ active }: { active: Scenario }) {
@@ -61,6 +64,7 @@ export default function App() {
       else if (e.key === '2') navigateTo('/approval');
       else if (e.key === '3') navigateTo('/ai-concierge');
       else if (e.key === '4') navigateTo('/incident-sre');
+      else if (e.key === '5') navigateTo('/council');
     };
     window.addEventListener('popstate', onNav);
     window.addEventListener('keydown', onKeyDown);
@@ -100,6 +104,7 @@ export default function App() {
       {scenario === 'approval' && <ApprovalWorkflow />}
       {scenario === 'ai-concierge' && <AiConcierge />}
       {scenario === 'incident-sre' && <IncidentCommander />}
+      {scenario === 'council' && <ParallelCouncil />}
       {scenario === null && (
         <div className="landing">
           <p className="landing-prompt">Select a live demo scenario</p>

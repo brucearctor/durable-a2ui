@@ -76,7 +76,7 @@ AUDIENCE_PID=$!
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}  All services running!${NC}"
 echo -e ""
-echo -e "  Presenter UI:  ${CYAN}http://localhost:5173${NC}  (4 scenarios)"
+echo -e "  Presenter UI:  ${CYAN}http://localhost:5173${NC}  (5 scenarios)"
 echo -e "  Audience UI:   ${CYAN}http://localhost:5174${NC}  (QR phone kiosk)"
 echo -e "  Slide Deck:    ${CYAN}http://localhost:8000/slides${NC}  (Talk presentation)"
 echo -e "  Go BFF API:    ${CYAN}http://localhost:8000${NC}  (SSE + WorkerManager)"

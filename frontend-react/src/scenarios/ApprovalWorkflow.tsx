@@ -58,6 +58,7 @@ export default function ApprovalWorkflow() {
   const [title, setTitle] = useState(PRESETS.cloud_infra.title);
   const [justification, setJustification] = useState(PRESETS.cloud_infra.justification);
   const [items, setItems] = useState<ExpenseItem[]>(PRESETS.cloud_infra.items);
+  const [requiredApprovals, setRequiredApprovals] = useState<number>(1);
 
   const applyPreset = (key: 'cloud_infra' | 'campus_hackathon') => {
     setPresetKey(key);
@@ -114,7 +115,14 @@ export default function ApprovalWorkflow() {
       const res = await fetch('/api/approvals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requester, title, justification, items, scenario: presetKey }),
+        body: JSON.stringify({
+          requester,
+          title,
+          justification,
+          items,
+          scenario: presetKey,
+          required_approvals: requiredApprovals,
+        }),
       });
       const result = await res.json();
       setWorkflowId(result.workflow_id);
@@ -124,7 +132,7 @@ export default function ApprovalWorkflow() {
     } finally {
       setLoading(false);
     }
-  }, [requester, title, justification, items, presetKey]);
+  }, [requester, title, justification, items, presetKey, requiredApprovals]);
 
   const resetDemo = useCallback(() => {
     setWorkflowId(null);
@@ -170,7 +178,7 @@ export default function ApprovalWorkflow() {
         <div className="order-form approval-form">
           <h2><ClipboardList size={20} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '8px' }} />Submit Dual-Surface Approval Request</h2>
 
-          <div className="mode-toggle" style={{ marginBottom: '14px' }}>
+          <div className="mode-toggle" style={{ marginBottom: '10px' }}>
             <button
               type="button"
               className={`mode-btn ${presetKey === 'cloud_infra' ? 'active durable' : ''}`}
@@ -184,6 +192,23 @@ export default function ApprovalWorkflow() {
               onClick={() => applyPreset('campus_hackathon')}
             >
               🎓 University Campus GPU & Hackathon Grant
+            </button>
+          </div>
+
+          <div className="mode-toggle" style={{ marginBottom: '14px' }}>
+            <button
+              type="button"
+              className={`mode-btn ${requiredApprovals === 1 ? 'active durable' : ''}`}
+              onClick={() => setRequiredApprovals(1)}
+            >
+              👤 Single Manager (1 Vote)
+            </button>
+            <button
+              type="button"
+              className={`mode-btn ${requiredApprovals === 3 ? 'active durable' : ''}`}
+              onClick={() => setRequiredApprovals(3)}
+            >
+              🗳️ Room Quorum Mode (3 Votes)
             </button>
           </div>
 
@@ -288,7 +313,8 @@ export default function ApprovalWorkflow() {
             disabled={approverStream.status !== 'connected'}
             title="Approve (A)"
           >
-            <CheckCircle size={14} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> Approve
+            <CheckCircle size={14} style={{ display: 'inline', verticalAlign: 'text-bottom' }} />{' '}
+            {requiredApprovals > 1 ? `Approve (+1 Vote / Need ${requiredApprovals})` : 'Approve'}
           </button>
           <button
             className="ctrl-btn cancel"

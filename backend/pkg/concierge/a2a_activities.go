@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ab/durable-a2ui/backend/pkg/a2aservers"
 )
@@ -18,24 +19,31 @@ func A2AFindRestaurantsActivity(ctx context.Context, args A2AFindRestaurantsArgs
 	if baseURL == "" {
 		baseURL = fmt.Sprintf("http://127.0.0.1:%d", a2aservers.RestaurantFinderPort)
 	}
-	raw, err := a2aservers.CallA2AAgent(ctx, baseURL, args.Query)
+	raw, xray, err := a2aservers.CallA2AAgentWithMeta(ctx, baseURL, args.Query)
 	if err != nil {
-		// Graceful fallback for unit tests where external HTTP server isn't started
+		// Propagate HTTP 503 Chaos Outages so Temporal's Activity Retry Policy retries!
+		if strings.Contains(err.Error(), "503") || strings.Contains(strings.ToLower(err.Error()), "outage") {
+			return nil, err
+		}
+		// Graceful fallback for offline unit tests where external HTTP server isn't started
 		return map[string]any{
 			"agent":       "restaurant_finder_a2a",
 			"protocol":    "A2A JSON-RPC 2.0",
 			"query":       args.Query,
 			"restaurants": a2aservers.RestaurantsCatalog,
+			"xray":        xray,
 		}, nil
 	}
 	var parsed map[string]any
 	if jsonErr := json.Unmarshal([]byte(raw), &parsed); jsonErr == nil {
+		parsed["xray"] = xray
 		return parsed, nil
 	}
 	return map[string]any{
 		"agent":    "restaurant_finder_a2a",
 		"protocol": "A2A JSON-RPC 2.0",
 		"response": raw,
+		"xray":     xray,
 	}, nil
 }
 
@@ -50,18 +58,23 @@ func A2ACheckDietarySafetyActivity(ctx context.Context, args A2ACheckDietaryArgs
 		baseURL = fmt.Sprintf("http://127.0.0.1:%d", a2aservers.DietaryAdvisorPort)
 	}
 	prompt := fmt.Sprintf("Check dietary safety for items: %s (restrictions: %s)", args.Items, args.Restrictions)
-	raw, err := a2aservers.CallA2AAgent(ctx, baseURL, prompt)
+	raw, xray, err := a2aservers.CallA2AAgentWithMeta(ctx, baseURL, prompt)
 	if err != nil {
+		if strings.Contains(err.Error(), "503") || strings.Contains(strings.ToLower(err.Error()), "outage") {
+			return nil, err
+		}
 		return map[string]any{
 			"agent":          "dietary_safety_advisor_a2a",
 			"protocol":       "A2A JSON-RPC 2.0",
 			"overall_status": "VERIFIED",
 			"items":          args.Items,
 			"recommendation": "All items verified safe against allergen database. Nut-free certified.",
+			"xray":           xray,
 		}, nil
 	}
 	var parsed map[string]any
 	if jsonErr := json.Unmarshal([]byte(raw), &parsed); jsonErr == nil {
+		parsed["xray"] = xray
 		return parsed, nil
 	}
 	return map[string]any{
@@ -69,5 +82,6 @@ func A2ACheckDietarySafetyActivity(ctx context.Context, args A2ACheckDietaryArgs
 		"protocol":       "A2A JSON-RPC 2.0",
 		"overall_status": "VERIFIED",
 		"response":       raw,
+		"xray":           xray,
 	}, nil
 }

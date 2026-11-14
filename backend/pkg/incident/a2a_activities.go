@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ab/durable-a2ui/backend/pkg/a2aservers"
 )
@@ -20,8 +21,11 @@ func A2ADiagnoseTelemetryActivity(ctx context.Context, args A2ADiagnoseTelemetry
 		baseURL = fmt.Sprintf("http://127.0.0.1:%d", a2aservers.TelemetryDiagPort)
 	}
 	prompt := fmt.Sprintf("Diagnose telemetry and canary diff for service=%s symptom=%s", args.Service, args.Symptom)
-	raw, err := a2aservers.CallA2AAgent(ctx, baseURL, prompt)
+	raw, xray, err := a2aservers.CallA2AAgentWithMeta(ctx, baseURL, prompt)
 	if err != nil {
+		if strings.Contains(err.Error(), "503") || strings.Contains(strings.ToLower(err.Error()), "outage") {
+			return nil, err
+		}
 		return map[string]any{
 			"agent":              "cloudguard_telemetry_a2a",
 			"protocol":           "A2A JSON-RPC 2.0",
@@ -30,16 +34,19 @@ func A2ADiagnoseTelemetryActivity(ctx context.Context, args A2ADiagnoseTelemetry
 			"baseline_revision":  "checkout-api-stable-v2.13.8",
 			"confidence":         0.96,
 			"recommended_action": "rollback_canary",
+			"xray":               xray,
 		}, nil
 	}
 	var parsed map[string]any
 	if jsonErr := json.Unmarshal([]byte(raw), &parsed); jsonErr == nil {
+		parsed["xray"] = xray
 		return parsed, nil
 	}
 	return map[string]any{
 		"agent":    "cloudguard_telemetry_a2a",
 		"protocol": "A2A JSON-RPC 2.0",
 		"response": raw,
+		"xray":     xray,
 	}, nil
 }
 
@@ -54,23 +61,29 @@ func A2AEvaluateBlastRadiusActivity(ctx context.Context, args A2AEvaluateBlastRa
 		baseURL = fmt.Sprintf("http://127.0.0.1:%d", a2aservers.SecOpsPolicyPort)
 	}
 	prompt := fmt.Sprintf("Evaluate blast radius for action=%s target=%s", args.Action, args.TargetRevision)
-	raw, err := a2aservers.CallA2AAgent(ctx, baseURL, prompt)
+	raw, xray, err := a2aservers.CallA2AAgentWithMeta(ctx, baseURL, prompt)
 	if err != nil {
+		if strings.Contains(err.Error(), "503") || strings.Contains(strings.ToLower(err.Error()), "outage") {
+			return nil, err
+		}
 		return map[string]any{
 			"agent":                   "secops_policy_a2a",
 			"protocol":                "A2A JSON-RPC 2.0",
 			"policy_check":            "PASS_WITH_HITL_GATE",
 			"requires_human_approval": true,
 			"approved_runbook":        "RB-402: Zero-Downtime Canary Traffic Shift (100% -> v2.13.8) + AlloyDB Idle Tx Termination",
+			"xray":                    xray,
 		}, nil
 	}
 	var parsed map[string]any
 	if jsonErr := json.Unmarshal([]byte(raw), &parsed); jsonErr == nil {
+		parsed["xray"] = xray
 		return parsed, nil
 	}
 	return map[string]any{
 		"agent":    "secops_policy_a2a",
 		"protocol": "A2A JSON-RPC 2.0",
 		"response": raw,
+		"xray":     xray,
 	}, nil
 }

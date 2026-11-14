@@ -17,8 +17,10 @@ export function useWorkerStatus() {
   const [killing, setKilling] = useState(false);
   const [restarting, setRestarting] = useState(false);
   const [downSince, setDownSince] = useState<number | null>(null);
+  const [a2aOutage, setA2aOutage] = useState(false);
+  const [togglingChaos, setTogglingChaos] = useState(false);
 
-  // Poll worker status
+  // Poll worker and A2A chaos status
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -29,12 +31,37 @@ export function useWorkerStatus() {
         if (data.running && !wasAlive) {
           setDownSince(null); // recovered
         }
+        const chaosRes = await fetch('/api/a2a/chaos');
+        if (chaosRes.ok) {
+          const chaosData = await chaosRes.json();
+          setA2aOutage(Boolean(chaosData.outage));
+        }
       } catch {
         // BFF might be down too
       }
     }, 2000);
     return () => clearInterval(interval);
   }, [workerAlive]);
+
+  const toggleA2AChaos = useCallback(async () => {
+    setTogglingChaos(true);
+    try {
+      const next = !a2aOutage;
+      const res = await fetch('/api/a2a/chaos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ outage: next }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setA2aOutage(Boolean(data.outage));
+      }
+    } catch (err) {
+      console.error('Failed to toggle A2A chaos:', err);
+    } finally {
+      setTogglingChaos(false);
+    }
+  }, [a2aOutage]);
 
   const killWorker = useCallback(async () => {
     setKilling(true);
@@ -64,7 +91,17 @@ export function useWorkerStatus() {
     }
   }, []);
 
-  return { workerAlive, killing, restarting, killWorker, restartWorker, downSince };
+  return {
+    workerAlive,
+    killing,
+    restarting,
+    killWorker,
+    restartWorker,
+    downSince,
+    a2aOutage,
+    togglingChaos,
+    toggleA2AChaos,
+  };
 }
 
 export function WorkerKillButton({ onKill, killing, workerAlive }: {

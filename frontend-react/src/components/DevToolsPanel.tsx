@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Terminal, X, ChevronRight, ChevronDown, Activity, List, PenTool as Tool, MessageSquare } from 'lucide-react';
+import { Terminal, X, ChevronRight, ChevronDown, Activity, List, PenTool as Tool, MessageSquare, Layers } from 'lucide-react';
+import { ProtocolXRayCard } from './ProtocolXRay';
 import './DevToolsPanel.css';
 
 interface DevToolsPanelProps {
@@ -38,10 +39,13 @@ export default function DevToolsPanel({ messages, onClose }: DevToolsPanelProps)
 
   const getBadgeColor = (type: string) => {
     switch (type) {
-      case 'turn_start': return 'blue';
-      case 'agent_handoff': return 'purple';
+      case 'turn_start':
+      case 'a2a_fanout_start': return 'blue';
+      case 'agent_handoff':
+      case 'schema_migration': return 'purple';
       case 'tool_call': return 'green';
-      case 'function_response': return 'teal';
+      case 'function_response':
+      case 'a2a_specialist_done': return 'teal';
       case 'turn_end': return 'gray';
       default: return 'gray';
     }
@@ -51,8 +55,10 @@ export default function DevToolsPanel({ messages, onClose }: DevToolsPanelProps)
     switch (type) {
       case 'turn_start': return <MessageSquare size={12} />;
       case 'agent_handoff': return <Activity size={12} />;
+      case 'schema_migration': return <Layers size={12} />;
       case 'tool_call': return <Tool size={12} />;
-      case 'function_response': return <Terminal size={12} />;
+      case 'function_response':
+      case 'a2a_specialist_done': return <Terminal size={12} />;
       case 'turn_end': return <List size={12} />;
       default: return <Activity size={12} />;
     }
@@ -65,11 +71,19 @@ export default function DevToolsPanel({ messages, onClose }: DevToolsPanelProps)
     if (trace.type === 'agent_handoff' && trace.agent) {
       return trace.agent;
     }
+    if (trace.type === 'schema_migration') {
+      return `${trace.surface || 'surface'} \u2192 v${trace.version || 2}`;
+    }
+    if (trace.type === 'a2a_specialist_done') {
+      const attempt = trace.xray?.attempt || 1;
+      return `${trace.specialist || 'specialist'} \u2192 ${trace.status || 'ok'}${attempt > 1 ? ` (Attempt #${attempt})` : ''}`;
+    }
     if (trace.type === 'tool_call' && trace.tool) {
       return trace.tool;
     }
     if (trace.type === 'function_response') {
-      return `${trace.function || 'unknown'} \u2192 ${trace.status || 'ok'}`;
+      const attempt = trace.xray?.attempt || 1;
+      return `${trace.function || 'unknown'} \u2192 ${trace.status || 'ok'}${attempt > 1 ? ` (Attempt #${attempt})` : ''}`;
     }
     if (trace.type === 'turn_end' && trace.tokens !== undefined) {
       return `${trace.tokens} tokens`;
@@ -153,6 +167,7 @@ export default function DevToolsPanel({ messages, onClose }: DevToolsPanelProps)
               </div>
               {isExpanded && (
                 <div className="trace-detail">
+                  <ProtocolXRayCard trace={trace} defaultOpen={true} />
                   <pre>{JSON.stringify(trace, null, 2)}</pre>
                 </div>
               )}

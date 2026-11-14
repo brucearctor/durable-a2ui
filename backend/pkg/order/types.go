@@ -11,9 +11,9 @@ type OrderItem struct {
 }
 
 type OrderInput struct {
-	Customer    string                       `json:"customer"`
-	Address     string                       `json:"address"`
-	Items       []OrderItem                  `json:"items"`
+	Customer    string                               `json:"customer"`
+	Address     string                               `json:"address"`
+	Items       []OrderItem                          `json:"items"`
 	StreamState *workflowstreams.WorkflowStreamState `json:"stream_state,omitempty"`
 }
 

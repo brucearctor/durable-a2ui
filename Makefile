@@ -2,7 +2,7 @@
 # editorconfig-checker, gitleaks, gosec, govulncheck, trivy, and nodejs;
 # every target below runs inside `nix develop`.
 
-.PHONY: build test lint fmt hygiene clean security scan-vuln scan-sast scan-secrets scan-deps setup demo slides
+.PHONY: build test lint fmt hygiene clean security scan-vuln scan-sast scan-secrets scan-deps setup demo e2e slides
 
 build:
 	@mkdir -p backend/bin
@@ -51,6 +51,9 @@ setup:
 
 demo:
 	./scripts/run-demo.sh
+
+e2e:
+	bash ./scripts/e2e.sh
 
 slides:
 	@echo "Opening slides/index.html (also served at http://localhost:8000/slides when backend is running)"

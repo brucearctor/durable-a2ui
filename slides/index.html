@@ -664,8 +664,38 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
     </div>
   </div>
 
-  <!-- SLIDE 14: Takeaways -->
-  <div class="slide" data-slide="13" data-notes="Wrap up with the 4 takeaways and invite questions!">
+  <!-- SLIDE 14: LIVE DEMO 5 (Parallel Council & Live Schema Upgrade) -->
+  <div class="slide" data-slide="13" data-demo="/council" data-notes="LIVE DEMO 5 (Tab 5: Parallel A2A Council + Live v1->v2 Schema Upgrade). Press L to open the embedded demo! 1) Toggle 'Simulate A2A 503 Outage' ON, then click 'Fan-Out Parallel A2A Council' — watch Temporal retry all 3 concurrent workflow.Go specialist activities against HTTP 503 until you click to heal the cluster! 2) Open the Protocol X-Ray Inspector to show 'Recovered on Attempt #N'. 3) Press U (or click Hot-Upgrade to v2 Executive Scorecard) to watch workflow.GetVersion + live signal hot-swap the A2UI surface from v1 to v2 mid-flight!">
+    <div class="eyebrow">Live Demo 5 · Tab 5 (Options A &amp; C)</div>
+    <h2>⚡ Parallel <span>A2A Council</span> &amp; Live <span>v1 &rarr; v2 Schema Swap</span></h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3>1️⃣ Concurrent <code>workflow.Go</code> Fan-Out</h3>
+        <p>Spawns 3 parallel A2A JSON-RPC 2.0 audits (<code>:9003</code> Reliability, <code>:9004</code> SecOps, <code>:9001</code> FinOps) and progressively populates the <code>council-board</code> A2UI surface.</p>
+      </div>
+      <div class="card amber">
+        <h3>2️⃣ A2A 503 Chaos &amp; Protocol X-Ray</h3>
+        <p>Flip on <strong>🔥 A2A 503 Outage</strong> mid-flight—Temporal retries with exponential backoff and records <code>Attempt #N</code> + raw AgentCard/JSON-RPC wire payloads in the X-Ray Inspector.</p>
+      </div>
+      <div class="card green">
+        <h3>3️⃣ Live <code>v1 &rarr; v2</code> UI Migration</h3>
+        <p>Uses <code>workflow.GetVersion</code> + live <code>upgrade_schema</code> signal to hot-swap <code>council-verdict</code> from a <code>v1</code> Compact Summary to a <code>v2</code> Executive Scorecard without restarting.</p>
+      </div>
+    </div>
+    <div class="demo-banner">
+      <div>
+        <strong>Presenter Shortcuts:</strong>
+        <span class="kbd">L</span> Embed Demo Here · <span class="kbd">U</span> Hot-Upgrade v1 &harr; v2 Schema · <span class="kbd">A</span> Approve Rollout · <span class="kbd">D</span> DevTools
+      </div>
+      <div class="demo-actions">
+        <button class="demo-cta" onclick="openEmbed('/council', event)">⚡ Embed Tab 5 Demo (L)</button>
+        <a class="demo-cta secondary" href="http://localhost:5173/council" target="_blank" rel="noopener">↗ Open Tab (:5173/council)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15: Takeaways -->
+  <div class="slide" data-slide="14" data-notes="Wrap up with the 4 takeaways and the student-friendly 5-file modular package layout, and invite questions!">
     <div class="eyebrow">Wrap-Up &amp; Q&amp;A</div>
     <h2>4 Rules for <span>Production AI Agents</span></h2>
     <div class="grid-2">
@@ -675,17 +705,30 @@ resp, _ := client.<span class="fn">SendMessage</span>(ctx, &amp;a2a.SendMessageR
           <li><strong>1. Separate Structure from State (A2UI v1.0):</strong> Send component trees once; stream lightweight <code>@path</code> JSON Pointer data-model deltas.</li>
           <li><strong>2. Standardize Agent Boundaries (A2A v2.8):</strong> Discover specialist agents via <code>/.well-known/agent-card.json</code> and communicate over JSON-RPC 2.0.</li>
           <li><strong>3. Enforce Guardrails in Code, Not Prompts:</strong> Check safety invariants and human approval gates deterministically in Go before executing side effects.</li>
-          <li><strong>4. Make Every Turn Durable (Temporal v1.51):</strong> With <code>googleadk</code> + <code>workflowstreams</code>, worker crashes and browser refreshes become non-events.</li>
+          <li><strong>4. Make Every Turn Durable (Temporal v1.51):</strong> With <code>googleadk</code> + <code>workflowstreams</code>, worker crashes, 503 outages, and live schema migrations become non-events.</li>
         </ul>
       </div>
       <div class="card">
-        <h3>📦 Run Everything Locally in 2 Commands</h3>
+        <h3>📦 Run &amp; Verify Everything in 3 Commands</h3>
         <pre class="code-block" style="margin-bottom:.9rem"><span class="cm"># 1. Enter reproducible Nix flake &amp; build Go + React stack</span>
 nix develop -c make setup
 
-<span class="cm"># 2. Launch Temporal + 4 Go A2A servers + Go Worker + API + UI</span>
+<span class="cm"># 2. Run automated E2E suite across all 5 scenarios + chaos</span>
+nix develop -c make e2e
+
+<span class="cm"># 3. Launch Temporal + 4 Go A2A servers + Go Worker + API + UI</span>
 nix develop -c make demo</pre>
-        <p><strong>Included in this repo:</strong> All 4 live scenarios, unit &amp; workflow tests (<code>make test</code>), <code>gosec</code> + <code>gitleaks</code> + <code>lefthook</code> pre-commit hygiene, speaker guide (<code>SPEAKER_GUIDE.md</code>), and these slides (<code>http://localhost:8000/slides</code>).</p>
+        <p><strong>Student-Friendly Modular Layout:</strong> Every scenario in <code>backend/pkg/{order,approval,concierge,incident,council}</code> follows the exact same 5-file anatomy (<code>types.go</code>, <code>messages.go</code>, <code>activities.go</code>/<code>agent.go</code>, <code>workflow.go</code>, <code>handler.go</code>).</p>
+        <div style="margin-top:.85rem;padding:.75rem 1rem;background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+          <div>
+            <div style="font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600">GitHub Repository</div>
+            <a href="https://github.com/brucearctor/durable-a2ui" target="_blank" rel="noopener" style="color:var(--accent-lt);font-family:var(--mono);font-size:.88rem;font-weight:600;text-decoration:none">
+              github.com/brucearctor/durable-a2ui
+            </a>
+            <div style="font-size:.72rem;color:var(--text-2);margin-top:2px">Clone &amp; run all 5 live scenarios with Nix or Go</div>
+          </div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&amp;data=https://github.com/brucearctor/durable-a2ui&amp;bgcolor=0c0c16&amp;color=a78bfa" alt="Repo QR" width="60" height="60" style="border-radius:6px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0">
+        </div>
       </div>
     </div>
   </div>
@@ -701,6 +744,7 @@ nix develop -c make demo</pre>
       <button class="top-btn" id="embApproval" onclick="switchEmbed('http://localhost:5173/approval', 'embApproval')">📋 Tab 2: Approval</button>
       <button class="top-btn" id="embConcierge" onclick="switchEmbed('http://localhost:5173/ai-concierge', 'embConcierge')">🤖 Tab 3: Concierge</button>
       <button class="top-btn" id="embIncident" onclick="switchEmbed('http://localhost:5173/incident-sre', 'embIncident')">🚨 Tab 4: SRE</button>
+      <button class="top-btn" id="embCouncil" onclick="switchEmbed('http://localhost:5173/council', 'embCouncil')">⚡ Tab 5: Council</button>
       <button class="top-btn" id="embTemporal" onclick="switchEmbed('http://localhost:8233', 'embTemporal')">⏳ Temporal UI (:8233)</button>
     </div>
     <div class="embed-tabs">
@@ -781,7 +825,7 @@ function toggleNotes(e) {
 }
 
 function switchEmbed(url, btnId) {
-  ['embOrder', 'embApproval', 'embConcierge', 'embIncident', 'embTemporal'].forEach(id => {
+  ['embOrder', 'embApproval', 'embConcierge', 'embIncident', 'embCouncil', 'embTemporal'].forEach(id => {
     document.getElementById(id).classList.toggle('active', id === btnId);
   });
   document.getElementById('embedFrame').src = url;
@@ -796,6 +840,7 @@ function openEmbed(path, e) {
     '/approval': 'embApproval',
     '/ai-concierge': 'embConcierge',
     '/incident-sre': 'embIncident',
+    '/council': 'embCouncil',
   };
   embedOpen = true;
   document.getElementById('embedModal').classList.add('open');

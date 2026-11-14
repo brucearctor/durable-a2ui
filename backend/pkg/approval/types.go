@@ -11,22 +11,26 @@ type ExpenseItem struct {
 }
 
 type ApprovalInput struct {
-	RequestID     string                       `json:"request_id"`
-	Requester     string                       `json:"requester"`
-	Title         string                       `json:"title"`
-	Justification string                       `json:"justification"`
-	Items         []ExpenseItem                `json:"items"`
-	Scenario      string                       `json:"scenario,omitempty"` // "campus_hackathon" or "devfest_cloud"
-	StreamState   *workflowstreams.WorkflowStreamState `json:"stream_state,omitempty"`
+	RequestID         string                               `json:"request_id"`
+	Requester         string                               `json:"requester"`
+	Title             string                               `json:"title"`
+	Justification     string                               `json:"justification"`
+	Items             []ExpenseItem                        `json:"items"`
+	RequiredApprovals int                                  `json:"required_approvals,omitempty"`
+	Scenario          string                               `json:"scenario,omitempty"`
+	StreamState       *workflowstreams.WorkflowStreamState `json:"stream_state,omitempty"`
 }
 
 type ApprovalState struct {
-	RequestID     string        `json:"request_id"`
-	Requester     string        `json:"requester"`
-	Title         string        `json:"title"`
-	Justification string        `json:"justification"`
-	Items         []ExpenseItem `json:"items"`
-	Total         float64       `json:"total"`
-	Status        string        `json:"status"` // submitted, under_review, approved, rejected
-	DecisionNote  string        `json:"decision_note"`
+	RequestID         string        `json:"request_id"`
+	Requester         string        `json:"requester"`
+	Title             string        `json:"title"`
+	Justification     string        `json:"justification"`
+	Items             []ExpenseItem `json:"items"`
+	Total             float64       `json:"total"`
+	Status            string        `json:"status"` // submitted, under_review, approved, rejected
+	DecisionNote      string        `json:"decision_note"`
+	RequiredApprovals int           `json:"required_approvals"`
+	ApprovalCount     int           `json:"approval_count"`
+	RejectionCount    int           `json:"rejection_count"`
 }

@@ -48,13 +48,63 @@ export function StatusBadge({ status, workflowId, clientCount, messageCount }: {
 
 export function QRShare({ workflowId, role }: { workflowId: string; role?: string }) {
   const [showQR, setShowQR] = useState(false);
-  // Point to audience kiosk app (port 5174) when running locally
-  const audienceOrigin = window.location.port === '5173'
+  const [configUrl, setConfigUrl] = useState('');
+  const [customUrl, setCustomUrl] = useState(() => {
+    try {
+      return localStorage.getItem('audience_public_url') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [editing, setEditing] = useState(false);
+  const [tempUrl, setTempUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.public_url === 'string' && data.public_url.trim()) {
+          setConfigUrl(data.public_url.trim());
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const defaultAudienceOrigin = window.location.port === '5173'
     ? window.location.origin.replace(':5173', ':5174')
     : window.location.origin;
+
+  const activeOrigin = (customUrl.trim() || configUrl.trim() || defaultAudienceOrigin).replace(/\/$/, '');
   const roleParam = role ? `&role=${role}` : '';
-  const shareUrl = `${audienceOrigin}?wf=${workflowId}${roleParam}`;
+  const shareUrl = `${activeOrigin}?wf=${workflowId}${roleParam}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}&bgcolor=0c0c16&color=a78bfa`;
+
+  const isLocalhost = activeOrigin.includes('localhost') || activeOrigin.includes('127.0.0.1');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSaveCustom = () => {
+    const trimmed = tempUrl.trim();
+    if (trimmed) {
+      try { localStorage.setItem('audience_public_url', trimmed); } catch {}
+      setCustomUrl(trimmed);
+    } else {
+      try { localStorage.removeItem('audience_public_url'); } catch {}
+      setCustomUrl('');
+    }
+    setEditing(false);
+  };
+
+  const handleReset = () => {
+    try { localStorage.removeItem('audience_public_url'); } catch {}
+    setCustomUrl('');
+    setEditing(false);
+  };
 
   return (
     <div className="qr-share">
@@ -64,11 +114,58 @@ export function QRShare({ workflowId, role }: { workflowId: string; role?: strin
       {showQR && (
         <div className="qr-popover">
           <img src={qrUrl} alt="QR Code" width={180} height={180} />
-          <p className="qr-hint">Scan to watch on another device (audience kiosk)</p>
-          <button className="qr-url" onClick={() => navigator.clipboard.writeText(shareUrl)} style={{ border: 'none', background: 'rgba(255,255,255,0.03)', display: 'block', width: '100%' }}>
-            {shareUrl.replace(audienceOrigin, '')}
-            <span className="copy-hint">click to copy</span>
+          <p className="qr-hint">Scan to watch / vote on mobile phone (audience kiosk)</p>
+          <button className="qr-url" onClick={handleCopy} style={{ border: 'none', background: 'rgba(255,255,255,0.03)', display: 'block', width: '100%', wordBreak: 'break-all' }}>
+            {shareUrl}
+            <span className="copy-hint">{copied ? '✓ Copied to clipboard!' : 'click to copy'}</span>
           </button>
+          {isLocalhost && !editing && (
+            <div style={{ marginTop: '10px', fontSize: '0.68rem', color: '#f59e0b', background: 'rgba(245,158,11,0.08)', padding: '6px 8px', borderRadius: '6px', textAlign: 'left', lineHeight: '1.4' }}>
+              ⚠️ Phones cannot open <code>localhost</code>. Run <code>./scripts/tunnel.sh 5174</code> and set the URL below or in <code>.env</code>.
+            </div>
+          )}
+          {!editing ? (
+            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+              <button
+                onClick={() => { setTempUrl(customUrl || configUrl || ''); setEditing(true); }}
+                style={{ fontSize: '0.68rem', color: 'var(--accent-lt)', background: 'transparent', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '4px', padding: '3px 8px', cursor: 'pointer' }}
+              >
+                {customUrl || configUrl ? '✏️ Edit Public URL' : '🌐 Set Public Tunnel URL'}
+              </button>
+              {(customUrl || configUrl) && (
+                <button
+                  onClick={handleReset}
+                  style={{ fontSize: '0.68rem', color: 'var(--text-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: '4px', padding: '3px 6px', cursor: 'pointer' }}
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={{ marginTop: '8px', textAlign: 'left' }}>
+              <input
+                type="text"
+                placeholder="https://...trycloudflare.com"
+                value={tempUrl}
+                onChange={(e) => setTempUrl(e.target.value)}
+                style={{ width: '100%', fontSize: '0.72rem', padding: '5px 8px', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--border-g)', borderRadius: '4px', color: '#fff', marginBottom: '6px' }}
+              />
+              <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setEditing(false)}
+                  style={{ fontSize: '0.68rem', padding: '3px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: '4px', color: 'var(--text-3)', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCustom}
+                  style={{ fontSize: '0.68rem', padding: '3px 8px', background: 'var(--accent)', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer' }}
+                >
+                  Save URL
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

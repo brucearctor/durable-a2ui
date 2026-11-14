@@ -11,17 +11,37 @@ const (
 	ApproverSurface  = "approver"
 )
 
-func statusText(status string) string {
-	switch status {
+func statusText(state ApprovalState) string {
+	switch state.Status {
 	case "submitted", "under_review":
+		if state.RequiredApprovals > 1 {
+			pct := (state.ApprovalCount * 100) / state.RequiredApprovals
+			return fmt.Sprintf("🟡 PendingReview — Audience Quorum: %d / %d Approvals (%d%%) • %d Rejections",
+				state.ApprovalCount, state.RequiredApprovals, pct, state.RejectionCount)
+		}
 		return "🟡 Pending Review"
 	case "approved":
+		if state.RequiredApprovals > 1 {
+			return fmt.Sprintf("🟢 Approved by Room Quorum (%d / %d Votes)", state.ApprovalCount, state.RequiredApprovals)
+		}
 		return "🟢 Approved"
 	case "rejected":
+		if state.RequiredApprovals > 1 {
+			return fmt.Sprintf("🔴 Rejected by Room Quorum (%d / %d Rejections)", state.RejectionCount, state.RequiredApprovals)
+		}
 		return "🔴 Rejected"
 	default:
-		return status
+		return state.Status
 	}
+}
+
+func requesterInfoText(state ApprovalState) string {
+	if state.RequiredApprovals > 1 {
+		pct := (state.ApprovalCount * 100) / state.RequiredApprovals
+		return fmt.Sprintf("Submitted by: %s  |  🗳️ Room Quorum: %d / %d Approved (%d%%)",
+			state.Requester, state.ApprovalCount, state.RequiredApprovals, pct)
+	}
+	return fmt.Sprintf("Submitted by: %s", state.Requester)
 }
 
 func CreateRequesterSurface() []map[string]any {
@@ -89,7 +109,7 @@ func BuildRequesterData(state ApprovalState) []map[string]any {
 	return []map[string]any{
 		a2ui.UpdateDataModel(RequesterSurface, "", map[string]any{
 			"title":         fmt.Sprintf("Expense #%s — %s", state.RequestID, state.Title),
-			"status_text":   statusText(state.Status),
+			"status_text":   statusText(state),
 			"submitted_by":  fmt.Sprintf("Submitted by %s", state.Requester),
 			"total":         fmt.Sprintf("Total: $%.2f", state.Total),
 			"justification": state.Justification,
@@ -102,7 +122,7 @@ func UpdateRequesterStatus(state ApprovalState) []map[string]any {
 	return []map[string]any{
 		a2ui.UpdateDataModel(RequesterSurface, "", map[string]any{
 			"title":       fmt.Sprintf("Expense #%s — %s", state.RequestID, state.Title),
-			"status_text": statusText(state.Status),
+			"status_text": statusText(state),
 		}),
 	}
 }
@@ -188,10 +208,18 @@ func BuildApproverData(state ApprovalState) []map[string]any {
 	return []map[string]any{
 		a2ui.UpdateDataModel(ApproverSurface, "", map[string]any{
 			"title":          fmt.Sprintf("Expense #%s — %s", state.RequestID, state.Title),
-			"requester_info": fmt.Sprintf("Submitted by: %s", state.Requester),
+			"requester_info": requesterInfoText(state),
 			"justification":  state.Justification,
 			"total":          fmt.Sprintf("Total: $%.2f", state.Total),
 			"items":          itemsData,
+		}),
+	}
+}
+
+func UpdateApproverQuorumProgress(state ApprovalState) []map[string]any {
+	return []map[string]any{
+		a2ui.UpdateDataModel(ApproverSurface, "", map[string]any{
+			"requester_info": requesterInfoText(state),
 		}),
 	}
 }

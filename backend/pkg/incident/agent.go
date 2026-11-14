@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"go.temporal.io/sdk/contrib/googleadk"
+	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"google.golang.org/adk/v2/agent"
 	"google.golang.org/adk/v2/agent/llmagent"
@@ -40,6 +41,12 @@ type IncidentToolHooks struct {
 func CreateIncidentAgent(hooks *IncidentToolHooks) (agent.Agent, error) {
 	actOpts := workflow.ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
+		RetryPolicy: &temporal.RetryPolicy{
+			InitialInterval:    1 * time.Second,
+			BackoffCoefficient: 1.5,
+			MaximumInterval:    3 * time.Second,
+			MaximumAttempts:    20,
+		},
 	}
 
 	a2aTelemetryTool, err := googleadk.ActivityAsTool(A2ADiagnoseTelemetryActivity, googleadk.ActivityToolOptions{

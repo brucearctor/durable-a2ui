@@ -52,14 +52,29 @@ export default function KioskApp() {
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const processorRef = useRef<MessageProcessor<any> | null>(null);
 
-  // Determine stream URL based on role
-  const streamUrl = role
-    ? `/api/approvals/${workflowId}/stream/${role}`
-    : `/api/sessions/${workflowId}/stream`;
+  // Determine stream URL based on role and workflow ID prefix
+  let streamUrl = `/api/orders/${workflowId}/stream`;
+  let signalUrl = `/api/orders/${workflowId}/signal`;
 
-  const signalUrl = role
-    ? `/api/approvals/${workflowId}/signal`
-    : `/api/sessions/${workflowId}/signal`;
+  if (role) {
+    streamUrl = `/api/approvals/${workflowId}/stream/${role}`;
+    signalUrl = `/api/approvals/${workflowId}/signal`;
+  } else if (workflowId?.startsWith('approval-')) {
+    streamUrl = `/api/approvals/${workflowId}/stream/approver`;
+    signalUrl = `/api/approvals/${workflowId}/signal`;
+  } else if (workflowId?.startsWith('concierge-')) {
+    streamUrl = `/api/concierge/${workflowId}/stream`;
+    signalUrl = `/api/concierge/${workflowId}/message`;
+  } else if (workflowId?.startsWith('incident-')) {
+    streamUrl = `/api/incidents/${workflowId}/stream`;
+    signalUrl = `/api/incidents/${workflowId}/approve`;
+  } else if (workflowId?.startsWith('council-')) {
+    streamUrl = `/api/council/${workflowId}/stream`;
+    signalUrl = `/api/council/${workflowId}/decide`;
+  } else if (workflowId?.startsWith('order-')) {
+    streamUrl = `/api/orders/${workflowId}/stream`;
+    signalUrl = `/api/orders/${workflowId}/signal`;
+  }
 
   // Send signal (for approver actions)
   const sendAction = useCallback(async (action: A2uiClientAction) => {
@@ -110,6 +125,9 @@ export default function KioskApp() {
   // Role badge
   const roleLabel = role === 'approver' ? '👔 Approver' :
                     role === 'requester' ? '👤 Requester' :
+                    workflowId?.startsWith('concierge-') ? '🍽️ AI Concierge' :
+                    workflowId?.startsWith('incident-') ? '🚨 Incident Commander' :
+                    workflowId?.startsWith('council-') ? '🏛️ A2A Council' :
                     '🍕 Live Order';
 
   if (!workflowId) {

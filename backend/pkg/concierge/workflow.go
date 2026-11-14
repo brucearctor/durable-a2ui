@@ -438,10 +438,27 @@ func ConciergeWorkflow(ctx workflow.Context, input ConciergeInput) (string, erro
 					}
 					if part.FunctionResponse != nil {
 						fnName := part.FunctionResponse.Name
+						var xray any
+						if part.FunctionResponse.Response != nil {
+							xray = part.FunctionResponse.Response["xray"]
+						}
+						if fnName == "a2a_find_restaurants" {
+							publishTrace("function_response", map[string]any{
+								"function": fnName,
+								"status":   "allowed",
+								"xray":     xray,
+							})
+						}
 						if fnName == "a2a_check_dietary_safety" {
 							dietaryChecked = true
-							publishTrace("function_response", map[string]any{"function": fnName, "status": "allowed"})
-							queuedA2UI = append(queuedA2UI, BuildDietarySurface("All cart items verified safe against our allergen database (nut-free kitchen certified, gluten-free corn tortillas verified).")...)
+							dietMsgs := BuildDietarySurface("All cart items verified safe against our allergen database (nut-free kitchen certified, gluten-free corn tortillas verified).")
+							publishTrace("function_response", map[string]any{
+								"function":      fnName,
+								"status":        "allowed",
+								"xray":          xray,
+								"a2ui_payloads": dietMsgs,
+							})
+							queuedA2UI = append(queuedA2UI, dietMsgs...)
 						}
 					}
 				}

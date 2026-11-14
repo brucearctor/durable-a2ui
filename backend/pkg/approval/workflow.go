@@ -22,49 +22,24 @@ func ApprovalWorkflow(ctx workflow.Context, input ApprovalInput) (string, error)
 		total += item.Amount
 	}
 
+	reqApprovals := input.RequiredApprovals
+	if reqApprovals <= 0 {
+		reqApprovals = 1
+	}
+
 	state := ApprovalState{
-		RequestID:     input.RequestID,
-		Requester:     input.Requester,
-		Title:         input.Title,
-		Justification: input.Justification,
-		Items:         input.Items,
-		Total:         total,
-		Status:        "submitted",
+		RequestID:         input.RequestID,
+		Requester:         input.Requester,
+		Title:             input.Title,
+		Justification:     input.Justification,
+		Items:             input.Items,
+		Total:             total,
+		Status:            "submitted",
+		RequiredApprovals: reqApprovals,
 	}
 
 	var decision string
 	var decisionNote string
-
-	approveCh := workflow.GetSignalChannel(ctx, "approve")
-	rejectCh := workflow.GetSignalChannel(ctx, "reject")
-	drainSignals := func() {
-		for {
-			var note string
-			if approveCh.ReceiveAsync(&note) {
-				if decision == "" {
-					decision = "approved"
-					if note == "" {
-						decisionNote = "Approved by manager"
-					} else {
-						decisionNote = note
-					}
-				}
-				continue
-			}
-			if rejectCh.ReceiveAsync(&note) {
-				if decision == "" {
-					decision = "rejected"
-					if note == "" {
-						decisionNote = "Rejected by manager"
-					} else {
-						decisionNote = note
-					}
-				}
-				continue
-			}
-			break
-		}
-	}
 
 	publishRequester := func(msgs []map[string]any) {
 		for _, m := range msgs {
@@ -74,6 +49,59 @@ func ApprovalWorkflow(ctx workflow.Context, input ApprovalInput) (string, error)
 	publishApprover := func(msgs []map[string]any) {
 		for _, m := range msgs {
 			_ = approverUI.Publish(m)
+		}
+	}
+
+	recordApprove := func(note string) {
+		if decision != "" {
+			return
+		}
+		state.ApprovalCount++
+		if state.ApprovalCount >= state.RequiredApprovals {
+			decision = "approved"
+			if note == "" {
+				decisionNote = "Approved by manager"
+			} else {
+				decisionNote = note
+			}
+		} else {
+			publishRequester(UpdateRequesterStatus(state))
+			publishApprover(UpdateApproverQuorumProgress(state))
+		}
+	}
+
+	recordReject := func(note string) {
+		if decision != "" {
+			return
+		}
+		state.RejectionCount++
+		if state.RejectionCount >= state.RequiredApprovals {
+			decision = "rejected"
+			if note == "" {
+				decisionNote = "Rejected by manager"
+			} else {
+				decisionNote = note
+			}
+		} else {
+			publishRequester(UpdateRequesterStatus(state))
+			publishApprover(UpdateApproverQuorumProgress(state))
+		}
+	}
+
+	approveCh := workflow.GetSignalChannel(ctx, "approve")
+	rejectCh := workflow.GetSignalChannel(ctx, "reject")
+	drainSignals := func() {
+		for {
+			var note string
+			if approveCh.ReceiveAsync(&note) {
+				recordApprove(note)
+				continue
+			}
+			if rejectCh.ReceiveAsync(&note) {
+				recordReject(note)
+				continue
+			}
+			break
 		}
 	}
 
@@ -125,26 +153,12 @@ func ApprovalWorkflow(ctx workflow.Context, input ApprovalInput) (string, error)
 		sel.AddReceive(approveCh, func(c workflow.ReceiveChannel, more bool) {
 			var note string
 			c.Receive(ctx, &note)
-			if decision == "" {
-				decision = "approved"
-				if note == "" {
-					decisionNote = "Approved by manager"
-				} else {
-					decisionNote = note
-				}
-			}
+			recordApprove(note)
 		})
 		sel.AddReceive(rejectCh, func(c workflow.ReceiveChannel, more bool) {
 			var note string
 			c.Receive(ctx, &note)
-			if decision == "" {
-				decision = "rejected"
-				if note == "" {
-					decisionNote = "Rejected by manager"
-				} else {
-					decisionNote = note
-				}
-			}
+			recordReject(note)
 		})
 		sel.AddFuture(timerFuture, func(f workflow.Future) {
 			if decision == "" {

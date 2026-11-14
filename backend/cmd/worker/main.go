@@ -13,6 +13,7 @@ import (
 
 	"github.com/ab/durable-a2ui/backend/pkg/approval"
 	"github.com/ab/durable-a2ui/backend/pkg/concierge"
+	"github.com/ab/durable-a2ui/backend/pkg/council"
 	"github.com/ab/durable-a2ui/backend/pkg/incident"
 	"github.com/ab/durable-a2ui/backend/pkg/order"
 )
@@ -85,21 +86,25 @@ func main() {
 		Name: "a2a_evaluate_blast_radius",
 	})
 
-	workers := []worker.Worker{orderWorker, approvalWorker, conciergeWorker, incidentWorker}
+	// 5. Parallel Architecture Council & Live Schema Migration Worker
+	councilWorker := worker.New(c, council.TaskQueue, worker.Options{})
+	councilWorker.RegisterWorkflow(council.CouncilWorkflow)
+	councilWorker.RegisterActivity(&council.Activities{})
+
+	workers := []worker.Worker{orderWorker, approvalWorker, conciergeWorker, incidentWorker, councilWorker}
 	for _, w := range workers {
 		if err := w.Start(); err != nil {
 			log.Fatalf("Failed to start worker: %v", err)
 		}
 	}
 
-	log.Printf("✅ Temporal Go Workers listening on queues: [%s, %s, %s, %s] (PID: %d)",
-		order.TaskQueue, approval.TaskQueue, concierge.TaskQueue, incident.TaskQueue, os.Getpid())
+	log.Printf("✅ Temporal Go Workers listening on queues: [%s, %s, %s, %s, %s] (PID: %d)",
+		order.TaskQueue, approval.TaskQueue, concierge.TaskQueue, incident.TaskQueue, council.TaskQueue, os.Getpid())
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
 
-	log.Println("Stopping Temporal Go workers...")
 	for _, w := range workers {
 		w.Stop()
 	}

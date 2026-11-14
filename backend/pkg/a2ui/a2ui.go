@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -19,6 +20,15 @@ const (
 	BasicCatalogID       = "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"
 	StreamStateQueryName = "a2ui_stream_state"
 )
+
+// TopicSSEHandler streams a named workflowstreams topic over HTTP Server-Sent Events.
+type TopicSSEHandler func(w http.ResponseWriter, r *http.Request, workflowID string, topic string)
+
+// WriteJSON encodes v as an application/json HTTP response.
+func WriteJSON(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(v)
+}
 
 func NewStream(ctx workflow.Context, priorState *workflowstreams.WorkflowStreamState) (*workflowstreams.WorkflowStream, error) {
 	stream, err := workflowstreams.NewWorkflowStream(ctx, priorState)

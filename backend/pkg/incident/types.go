@@ -12,22 +12,22 @@ import (
 const TaskQueue = "incident-commander"
 
 type IncidentInput struct {
-	CommanderName    string                       `json:"commander_name"`
-	ServiceName      string                       `json:"service_name"`
-	IncidentSummary  string                       `json:"incident_summary"`
+	CommanderName    string                               `json:"commander_name"`
+	ServiceName      string                               `json:"service_name"`
+	IncidentSummary  string                               `json:"incident_summary"`
 	StreamState      *workflowstreams.WorkflowStreamState `json:"stream_state,omitempty"`
-	PendingMessages  []string                     `json:"pending_messages,omitempty"`
-	TelemetryChecked bool                         `json:"telemetry_checked,omitempty"`
-	PolicyChecked    bool                         `json:"policy_checked,omitempty"`
-	Remediated       bool                         `json:"remediated,omitempty"`
-	MessageCounter   int                          `json:"message_counter,omitempty"`
-	TotalTokens      int                          `json:"total_tokens,omitempty"`
-	TotalCostUSD     float64                      `json:"total_cost_usd,omitempty"`
-	TurnCount        int                          `json:"turn_count,omitempty"`
-	ToolCallCount    int                          `json:"tool_call_count,omitempty"`
-	SessionSnapshot  *googleadk.SessionSnapshot   `json:"session_snapshot,omitempty"`
-	ApprovalRequired bool                         `json:"approval_required,omitempty"`
-	ApprovalDecision string                       `json:"approval_decision,omitempty"`
+	PendingMessages  []string                             `json:"pending_messages,omitempty"`
+	TelemetryChecked bool                                 `json:"telemetry_checked,omitempty"`
+	PolicyChecked    bool                                 `json:"policy_checked,omitempty"`
+	Remediated       bool                                 `json:"remediated,omitempty"`
+	MessageCounter   int                                  `json:"message_counter,omitempty"`
+	TotalTokens      int                                  `json:"total_tokens,omitempty"`
+	TotalCostUSD     float64                              `json:"total_cost_usd,omitempty"`
+	TurnCount        int                                  `json:"turn_count,omitempty"`
+	ToolCallCount    int                                  `json:"tool_call_count,omitempty"`
+	SessionSnapshot  *googleadk.SessionSnapshot           `json:"session_snapshot,omitempty"`
+	ApprovalRequired bool                                 `json:"approval_required,omitempty"`
+	ApprovalDecision string                               `json:"approval_decision,omitempty"`
 }
 
 func (in *IncidentInput) ApplyDefaults() {

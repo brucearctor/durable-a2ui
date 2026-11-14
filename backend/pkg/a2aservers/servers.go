@@ -1,25 +1,38 @@
 package a2aservers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"iter"
 	"net/http"
 	"strings"
+	"sync/atomic"
+	"time"
 
 	"github.com/a2aproject/a2a-go/v2/a2a"
 	"github.com/a2aproject/a2a-go/v2/a2aclient"
 	"github.com/a2aproject/a2a-go/v2/a2aclient/agentcard"
 	"github.com/a2aproject/a2a-go/v2/a2asrv"
+	"go.temporal.io/sdk/activity"
 )
 
 const (
-	RestaurantFinderPort  = 9001
-	DietaryAdvisorPort    = 9002
-	TelemetryDiagPort     = 9003
-	SecOpsPolicyPort      = 9004
+	RestaurantFinderPort = 9001
+	DietaryAdvisorPort   = 9002
+	TelemetryDiagPort    = 9003
+	SecOpsPolicyPort     = 9004
 )
+
+type A2ACallMeta struct {
+	AgentName string         `json:"agent_name"`
+	Endpoint  string         `json:"endpoint"`
+	Attempt   int32          `json:"attempt"`
+	AgentCard map[string]any `json:"agent_card,omitempty"`
+	Request   map[string]any `json:"request,omitempty"`
+	Response  map[string]any `json:"response,omitempty"`
+}
 
 type handlerFunc func(prompt string) string
 
@@ -52,41 +65,157 @@ func (e *funcExecutor) Cancel(_ context.Context, execCtx *a2asrv.ExecutorContext
 }
 
 func NewServerMux(card *a2a.AgentCard, fn handlerFunc) *http.ServeMux {
+	var outage atomic.Bool
 	executor := &funcExecutor{fn: fn}
 	requestHandler := a2asrv.NewHandler(executor)
+	rpcHandler := a2asrv.NewJSONRPCHandler(requestHandler)
+	cardHandler := a2asrv.NewStaticAgentCardHandler(card)
+
+	guardOutage := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if outage.Load() {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusServiceUnavailable)
+				_, _ = w.Write([]byte(`{"error":"Simulated A2A remote agent outage (HTTP 503)"}`))
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+
 	mux := http.NewServeMux()
-	mux.Handle("/invoke", a2asrv.NewJSONRPCHandler(requestHandler))
-	mux.Handle(a2asrv.WellKnownAgentCardPath, a2asrv.NewStaticAgentCardHandler(card))
+	mux.Handle("/invoke", guardOutage(rpcHandler))
+	mux.Handle(a2asrv.WellKnownAgentCardPath, guardOutage(cardHandler))
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"ok"}`))
+		if outage.Load() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = w.Write([]byte(`{"status":"outage","outage":true}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"status":"ok","outage":false}`))
+	})
+	mux.HandleFunc("/chaos", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			var body struct {
+				Outage bool `json:"outage"`
+			}
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			outage.Store(body.Outage)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"agent":  card.Name,
+			"outage": outage.Load(),
+		})
 	})
 	return mux
 }
 
-// CallA2AAgent resolves the remote A2A AgentCard over HTTP and invokes SendMessage via JSON-RPC 2.0.
-func CallA2AAgent(ctx context.Context, baseURL string, prompt string) (string, error) {
+func AllPorts() []int {
+	return []int{RestaurantFinderPort, DietaryAdvisorPort, TelemetryDiagPort, SecOpsPolicyPort}
+}
+
+func SetClusterChaos(ctx context.Context, outage bool) {
+	hc := &http.Client{Timeout: 2 * time.Second}
+	payload, _ := json.Marshal(map[string]bool{"outage": outage})
+	for _, port := range AllPorts() {
+		url := fmt.Sprintf("http://127.0.0.1:%d/chaos", port)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(payload))
+		if err != nil {
+			continue
+		}
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := hc.Do(req)
+		if err == nil {
+			_ = resp.Body.Close()
+		}
+	}
+}
+
+func GetClusterChaos(ctx context.Context) bool {
+	hc := &http.Client{Timeout: 1 * time.Second}
+	for _, port := range AllPorts() {
+		url := fmt.Sprintf("http://127.0.0.1:%d/chaos", port)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			continue
+		}
+		resp, err := hc.Do(req)
+		if err != nil {
+			continue
+		}
+		var data struct {
+			Outage bool `json:"outage"`
+		}
+		_ = json.NewDecoder(resp.Body).Decode(&data)
+		_ = resp.Body.Close()
+		if data.Outage {
+			return true
+		}
+	}
+	return false
+}
+
+func currentActivityAttempt(ctx context.Context) int32 {
+	defer func() { _ = recover() }()
+	info := activity.GetInfo(ctx)
+	if info.Attempt > 0 {
+		return info.Attempt
+	}
+	return 1
+}
+
+// CallA2AAgentWithMeta resolves the remote A2A AgentCard over HTTP, invokes SendMessage via JSON-RPC 2.0,
+// and returns the text response along with wire-level Protocol X-Ray metadata.
+func CallA2AAgentWithMeta(ctx context.Context, baseURL string, prompt string) (string, A2ACallMeta, error) {
+	attempt := currentActivityAttempt(ctx)
+	meta := A2ACallMeta{
+		Endpoint: baseURL,
+		Attempt:  attempt,
+		Request: map[string]any{
+			"jsonrpc": "2.0",
+			"method":  "message/send",
+			"params": map[string]any{
+				"message": map[string]any{
+					"role":  "user",
+					"parts": []map[string]any{{"kind": "text", "text": prompt}},
+				},
+			},
+		},
+	}
+
 	card, err := agentcard.DefaultResolver.Resolve(ctx, baseURL)
 	if err != nil {
-		return "", fmt.Errorf("resolve agent card at %s: %w", baseURL, err)
+		return "", meta, fmt.Errorf("resolve agent card at %s (attempt %d): %w", baseURL, attempt, err)
 	}
+	meta.AgentName = card.Name
+	if cb, merr := json.Marshal(card); merr == nil {
+		var cardMap map[string]any
+		if json.Unmarshal(cb, &cardMap) == nil {
+			meta.AgentCard = cardMap
+		}
+	}
+
 	client, err := a2aclient.NewFromCard(ctx, card)
 	if err != nil {
-		return "", fmt.Errorf("create a2a client for %s: %w", baseURL, err)
+		return "", meta, fmt.Errorf("create a2a client for %s: %w", baseURL, err)
 	}
 	resp, err := client.SendMessage(ctx, &a2a.SendMessageRequest{
 		Message: a2a.NewMessage(a2a.MessageRoleUser, a2a.NewTextPart(prompt)),
 	})
 	if err != nil {
-		return "", fmt.Errorf("send a2a message to %s: %w", baseURL, err)
+		return "", meta, fmt.Errorf("send a2a message to %s (attempt %d): %w", baseURL, attempt, err)
 	}
+
+	var replyText string
 	switch v := resp.(type) {
 	case *a2a.Message:
 		var sb strings.Builder
 		for _, p := range v.Parts {
 			sb.WriteString(p.Text())
 		}
-		return sb.String(), nil
+		replyText = sb.String()
 	case *a2a.Task:
 		var sb strings.Builder
 		for _, a := range v.Artifacts {
@@ -99,11 +228,33 @@ func CallA2AAgent(ctx context.Context, baseURL string, prompt string) (string, e
 				sb.WriteString(p.Text())
 			}
 		}
-		return sb.String(), nil
+		replyText = sb.String()
 	default:
 		b, _ := json.Marshal(resp)
-		return string(b), nil
+		replyText = string(b)
 	}
+
+	var parsedReply any = replyText
+	var jsonReply map[string]any
+	if json.Unmarshal([]byte(replyText), &jsonReply) == nil {
+		parsedReply = jsonReply
+	}
+	meta.Response = map[string]any{
+		"jsonrpc": "2.0",
+		"result": map[string]any{
+			"role":    "agent",
+			"attempt": attempt,
+			"payload": parsedReply,
+		},
+	}
+
+	return replyText, meta, nil
+}
+
+// CallA2AAgent resolves the remote A2A AgentCard over HTTP and invokes SendMessage via JSON-RPC 2.0.
+func CallA2AAgent(ctx context.Context, baseURL string, prompt string) (string, error) {
+	txt, _, err := CallA2AAgentWithMeta(ctx, baseURL, prompt)
+	return txt, err
 }
 
 // ---------------------------------------------------------------------------
@@ -358,11 +509,11 @@ func DietaryAdvisorServer(port int) *http.ServeMux {
 			}
 		}
 		payload := map[string]any{
-			"agent":           "dietary_safety_advisor_a2a",
-			"protocol":        "A2A JSON-RPC 2.0",
-			"overall_status":  "VERIFIED",
-			"checked_items":   results,
-			"recommendation":  "All items verified against allergen database. Nut-free kitchen certified.",
+			"agent":          "dietary_safety_advisor_a2a",
+			"protocol":       "A2A JSON-RPC 2.0",
+			"overall_status": "VERIFIED",
+			"checked_items":  results,
+			"recommendation": "All items verified against allergen database. Nut-free kitchen certified.",
 		}
 		b, _ := json.Marshal(payload)
 		return string(b)
@@ -416,10 +567,10 @@ func TelemetryDiagnosticsServer(port int) *http.ServeMux {
 				"alloydb_conn_pool_use": "200/200 (100% SATURATED)",
 				"affected_rps":          14200,
 			},
-			"root_cause":          "Canary v2.14.0-rc3 introduced an unclosed pgx transaction inside retry middleware when payment webhook times out, exhausting the 200-connection AlloyDB pool in 90 seconds.",
-			"confidence":          0.96,
-			"recommended_action":  "rollback_canary",
-			"target_revision":     "checkout-api-stable-v2.13.8",
+			"root_cause":           "Canary v2.14.0-rc3 introduced an unclosed pgx transaction inside retry middleware when payment webhook times out, exhausting the 200-connection AlloyDB pool in 90 seconds.",
+			"confidence":           0.96,
+			"recommended_action":   "rollback_canary",
+			"target_revision":      "checkout-api-stable-v2.13.8",
 			"secondary_mitigation": "drain_leaked_db_sessions",
 		}
 		b, _ := json.Marshal(payload)
