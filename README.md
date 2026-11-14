@@ -9,6 +9,10 @@ Every backend component—workflows, multi-agent orchestration, remote A2A serve
 * **🎨 Agent-to-UI Protocol (`A2UI v1.0`)**: Declarative component trees (`createSurface`, `updateComponents`, `updateDataModel`, `deleteSurface`) with `@a2ui/react v0.15.0` & `@a2ui/web_core v0.15.0` streamed over `go.temporal.io/sdk/contrib/workflowstreams v0.1.1` topics (`a2ui`, `requester-ui`, `approver-ui`).
 * **⏳ Durable Execution (`Temporal SDK v1.51.0`)**: Server-side state, programmatic guardrails, human-in-the-loop (HITL) approval gates, concurrent `workflow.Go` fan-out, live `workflow.GetVersion` schema migration, child workflows, and `SIGKILL` crash recovery.
 
+> 📜 **Prior Work & Related Presentation:**
+> * **Prior Work (Python Prototype):** [brucearctor/a2ui-workflow-streams](https://github.com/brucearctor/a2ui-workflow-streams)
+> * **Related Presentation Slides:** [Google Slides Deck](https://docs.google.com/presentation/d/12E7tx-6DkCLqqWFvItu_chxdHILgFS69X9Iu0g6FOb8/edit?slide=id.p#slide=id.p) (also served locally as an interactive offline HTML deck at `http://localhost:8000/slides`)
+
 ---
 
 ## Student-Friendly Modular Architecture (Self-Contained Scenario Packages)
